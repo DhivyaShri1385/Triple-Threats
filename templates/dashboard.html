@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UEBA — SOC Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#00ff41;--green2:#00cc33;--green3:#008f11;--green4:#003d09;
+  --bg:#0d0d0d;--panel:#050505;--border:#00ff4120;
+  --red:#ff0040;--yellow:#ffff00;--cyan:#00d4ff;
+  --orange:#ff9900;--font:'Courier New',monospace;
+}
+body{background:var(--bg);color:var(--green);font-family:var(--font);min-height:100vh}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.1) 2px,rgba(0,0,0,.1) 4px);
+}
+.topbar{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;z-index:100;
+}
+.logo{font-size:16px;font-weight:700;color:var(--green);letter-spacing:3px}
+.logo span{color:var(--green3)}
+.status{display:flex;align-items:center;gap:16px;font-size:11px}
+.pulse-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--green);
+  animation:pulse 1s infinite;box-shadow:0 0 6px var(--green);
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.main{padding:16px;display:grid;gap:12px}
+.row{display:grid;gap:12px}
+.row-4{grid-template-columns:repeat(4,1fr)}
+.row-2{grid-template-columns:1fr 1fr}
+.row-32{grid-template-columns:3fr 2fr}
+@media(max-width:900px){.row-4,.row-2,.row-32{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:16px}
+.panel-title{
+  font-size:10px;letter-spacing:3px;color:var(--green3);
+  text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel-title::before{content:'>';color:var(--green3)}
+.stat-val{font-size:30px;font-weight:700;color:var(--green);font-family:var(--font)}
+.stat-label{font-size:10px;color:var(--green3);letter-spacing:2px;margin-top:4px}
+.feed-item{
+  padding:8px 10px;margin-bottom:6px;border-radius:2px;
+  border-left:2px solid var(--green3);font-size:11px;
+  background:#050505;display:flex;align-items:center;gap:10px;
+  animation:slideIn .3s ease;
+}
+@keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.feed-scroll{max-height:380px;overflow-y:auto}
+.feed-scroll::-webkit-scrollbar{width:3px}
+.feed-scroll::-webkit-scrollbar-thumb{background:var(--green3)}
+.feed-ts{color:var(--green3);font-size:10px;white-space:nowrap}
+.feed-hash{color:var(--cyan);font-size:10px;font-family:monospace}
+.feed-score{margin-left:auto;font-weight:700;font-size:12px}
+.badge{
+  padding:2px 8px;border-radius:2px;font-size:10px;
+  font-weight:700;letter-spacing:1px;border:1px solid;
+}
+.gauge-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:11px}
+.gauge-label{width:140px;color:var(--green3);font-size:10px;letter-spacing:1px}
+.gauge-track{flex:1;height:8px;background:var(--green4);border:1px solid var(--green3);overflow:hidden}
+.gauge-fill{height:100%;background:var(--green3);transition:width .4s ease;width:0%}
+.gauge-val{width:50px;text-align:right;font-size:10px;color:var(--green)}
+canvas{max-height:200px}
+.model-status{
+  padding:12px;border:1px solid var(--border);
+  border-radius:2px;text-align:center;
+}
+.model-val{font-size:22px;font-weight:700;color:var(--green)}
+.model-label{font-size:10px;color:var(--green3);letter-spacing:2px;margin-top:4px}
+.btn-logout{
+  background:transparent;border:1px solid #ff004040;
+  color:var(--red);font-family:var(--font);font-size:11px;
+  padding:5px 12px;cursor:pointer;letter-spacing:1px;
+}
+.btn-logout:hover{background:#ff004020}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--green3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="logo">UEBA<span>-SOC</span> TERMINAL</div>
+    <div style="font-size:10px;color:var(--green3);letter-spacing:2px">
+      REAL-TIME BEHAVIORAL ANOMALY DETECTION
+    </div>
+  </div>
+  <div class="status">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="pulse-dot"></div>
+      <span style="color:var(--green3)">SYSTEM ACTIVE</span>
+    </div>
+    <span style="color:var(--green3)" id="clock">--:--:--</span>
+    <span style="color:var(--cyan)" id="topUser">--</span>
+    <button class="btn-logout" onclick="doLogout()">[LOGOUT]</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="row row-4">
+    <div class="panel">
+      <div class="panel-title">Total sessions</div>
+      <div class="stat-val" id="s-total">0</div>
+      <div class="stat-label">login attempts</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Anomalies detected</div>
+      <div class="stat-val" id="s-anomalies" style="color:var(--red)">0</div>
+      <div class="stat-label">suspicious logins</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Blocked IPs</div>
+      <div class="stat-val" id="s-blocked" style="color:var(--orange)">0</div>
+      <div class="stat-label">auto-blocked</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Model status</div>
+      <div class="stat-val" id="s-model" style="color:var(--cyan)">—</div>
+      <div class="stat-label" id="s-model-label">initializing</div>
+    </div>
+  </div>
+
+  <div class="row row-32">
+    <div class="panel">
+      <div class="panel-title">Live session feed</div>
+      <div class="feed-scroll" id="feed"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Behavioral metrics</div>
+      <div class="gauge-row">
+        <span class="gauge-label">KEYSTROKE RHYTHM</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-rhythm"></div></div>
+        <span class="gauge-val" id="gv-rhythm">—</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">TYPING SPEED</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-speed"></div></div>
+        <span class="gauge-val" id="gv-speed">—</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">MOUSE VELOCITY</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-mouse"></div></div>
+        <span class="gauge-val" id="gv-mouse">—</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">HESITATIONS</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-hesit" style="background:var(--orange)"></div></div>
+        <span class="gauge-val" id="gv-hesit">—</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">BOT SIGNALS</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-bot" style="background:var(--red)"></div></div>
+        <span class="gauge-val" id="gv-bot">—</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">LINEARITY</span>
+        <div class="gauge-track"><div class="gauge-fill" id="g-line"></div></div>
+        <span class="gauge-val" id="gv-line">—</span>
+      </div>
+      <div style="margin-top:16px">
+        <div class="panel-title">Threat distribution</div>
+        <canvas id="threatChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-2">
+    <div class="panel">
+      <div class="panel-title">Anomaly score timeline</div>
+      <canvas id="scoreChart"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Attack level breakdown</div>
+      <canvas id="levelChart"></canvas>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">ML model — Isolation Forest status</div>
+    <div class="row row-4" style="gap:10px">
+      <div class="model-status">
+        <div class="model-val" id="m-trained">—</div>
+        <div class="model-label">TRAINED</div>
+      </div>
+      <div class="model-status">
+        <div class="model-val" id="m-samples">—</div>
+        <div class="model-label">TRAINING SAMPLES</div>
+      </div>
+      <div class="model-status">
+        <div class="model-val" id="m-threshold">30</div>
+        <div class="model-label">THRESHOLD</div>
+      </div>
+      <div class="model-status">
+        <div class="model-val" id="m-rate" style="color:var(--red)">—</div>
+        <div class="model-label">ANOMALY RATE</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString()},1000)
+
+const COLORS={CRITICAL:'#ff0040',HIGH:'#ff4444',MEDIUM:'#ff9900',LOW:'#ffff00',NORMAL:'#00ff41',LEARNING:'#00d4ff'}
+let scoreChart,levelChart,threatChart
+let scoreLabels=[],scoreData=[]
+
+function initCharts(){
+  scoreChart=new Chart(document.getElementById('scoreChart'),{
+    type:'line',
+    data:{
+      labels:scoreLabels,
+      datasets:[{
+        label:'Anomaly Score',data:scoreData,
+        borderColor:'#00ff41',backgroundColor:'#00ff4110',
+        borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#00ff41',
+        fill:true,tension:.3,
+      }]
+    },
+    options:{
+      scales:{
+        x:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{family:'Courier New',size:10}}},
+        y:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{family:'Courier New',size:10}},min:-0.5,max:0.2},
+      },
+      plugins:{legend:{display:false}},animation:{duration:300},
+    }
+  })
+
+  levelChart=new Chart(document.getElementById('levelChart'),{
+    type:'bar',
+    data:{
+      labels:['NORMAL','LOW','MEDIUM','HIGH','CRITICAL'],
+      datasets:[{
+        data:[0,0,0,0,0],
+        backgroundColor:['#00ff4140','#ffff0040','#ff990040','#ff444440','#ff004040'],
+        borderColor:['#00ff41','#ffff00','#ff9900','#ff4444','#ff0040'],
+        borderWidth:1,borderRadius:2,
+      }]
+    },
+    options:{
+      scales:{
+        x:{grid:{display:false},ticks:{color:'#008f11',font:{family:'Courier New',size:10}}},
+        y:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{family:'Courier New',size:10}}},
+      },
+      plugins:{legend:{display:false}},
+    }
+  })
+
+  threatChart=new Chart(document.getElementById('threatChart'),{
+    type:'doughnut',
+    data:{
+      labels:['Normal','Anomalies'],
+      datasets:[{
+        data:[1,0],
+        backgroundColor:['#00ff4130','#ff004040'],
+        borderColor:['#00ff41','#ff0040'],
+        borderWidth:1,
+      }]
+    },
+    options:{
+      cutout:'70%',
+      plugins:{legend:{labels:{color:'#008f11',font:{family:'Courier New',size:10}}}},
+    }
+  })
+}
+
+async function loadEvents(){
+  const r=await fetch('/api/events')
+  const data=await r.json()
+  const feed=document.getElementById('feed')
+  feed.innerHTML=''
+  const levelCounts={NORMAL:0,LOW:0,MEDIUM:0,HIGH:0,CRITICAL:0}
+  let normalCount=0,anomalyCount=0
+
+  data.forEach(e=>{
+    const col=COLORS[e.threat_level]||'#00ff41'
+    const div=document.createElement('div')
+    div.className='feed-item'
+    div.style.borderLeftColor=col
+    const badgeStyle=`color:${col};border-color:${col}40;background:${col}10`
+    div.innerHTML=`
+      <span class="feed-ts">${e.timestamp?.slice(11,19)||'--:--:--'}</span>
+      <span class="feed-hash">${e.username_hash}</span>
+      <span class="badge" style="${badgeStyle}">${e.threat_level}</span>
+      <span class="feed-score" style="color:${col}">${e.anomaly_score?.toFixed(3)||'?'}</span>
+      ${e.is_anomaly?'<span style="color:#ff0040;font-size:10px">⚠ ANOMALY</span>':''}
+    `
+    feed.appendChild(div)
+    if(levelCounts[e.threat_level]!==undefined)levelCounts[e.threat_level]++
+    if(e.is_anomaly)anomalyCount++;else normalCount++
+    if(e.anomaly_score!==null&&scoreData.length<20){
+      scoreData.push(e.anomaly_score)
+      scoreLabels.push(e.timestamp?.slice(11,19)||'')
+    }
+  })
+
+  if(levelChart){levelChart.data.datasets[0].data=Object.values(levelCounts);levelChart.update()}
+  if(threatChart){threatChart.data.datasets[0].data=[normalCount,anomalyCount];threatChart.update()}
+  if(scoreChart){
+    scoreChart.data.labels=scoreLabels.slice(-20)
+    scoreChart.data.datasets[0].data=scoreData.slice(-20)
+    scoreChart.update()
+  }
+}
+
+async function loadStats(){
+  const r=await fetch('/api/stats')
+  const data=await r.json()
+  document.getElementById('s-total').textContent=data.total||0
+  document.getElementById('s-anomalies').textContent=data.anomalies||0
+  document.getElementById('s-blocked').textContent=data.blocked_ips||0
+  const trained=data.is_trained
+  const mEl=document.getElementById('s-model')
+  const mLabel=document.getElementById('s-model-label')
+  mEl.textContent=trained?'ACTIVE':'LEARNING'
+  mEl.style.color=trained?'#00ff41':'#00d4ff'
+  mLabel.textContent=trained?'anomaly detection on':`${data.training_samples||0}/${data.threshold||30} samples`
+  document.getElementById('m-trained').textContent=trained?'YES':'NO'
+  document.getElementById('m-trained').style.color=trained?'#00ff41':'#ff9900'
+  document.getElementById('m-samples').textContent=data.training_samples||0
+  document.getElementById('m-rate').textContent=(data.anomaly_rate||0)+'%'
+}
+
+async function updateGauges(){
+  const r=await fetch('/api/events')
+  const data=await r.json()
+  if(!data.length)return
+  const latest=data[0]
+  const score=latest.anomaly_score||0
+  const rhythm=Math.max(0,(score+0.5)*100)
+  setG('g-rhythm','gv-rhythm',rhythm,rhythm.toFixed(0)+'%')
+  setG('g-speed','gv-speed',60,'—')
+  setG('g-mouse','gv-mouse',50,'—')
+  const hesit=latest.is_anomaly?60:10
+  setG('g-hesit','gv-hesit',hesit,latest.is_anomaly?'HIGH':'LOW')
+  const bot=latest.threat_level==='CRITICAL'?80:5
+  setG('g-bot','gv-bot',bot,bot+'%')
+  setG('g-line','gv-line',70,'—')
+}
+
+function setG(barId,valId,pct,label){
+  const b=document.getElementById(barId)
+  const v=document.getElementById(valId)
+  if(b)b.style.width=Math.min(pct,100)+'%'
+  if(v)v.textContent=label
+}
+
+async function loadMe(){
+  try{
+    const r=await fetch('/api/me')
+    if(r.status===401){window.location.href='/login';return}
+    const d=await r.json()
+    document.getElementById('topUser').textContent=d.username||'—'
+  }catch(e){}
+}
+
+async function doLogout(){
+  await fetch('/api/logout',{method:'POST'})
+  window.location.href='/login'
+}
+
+initCharts()
+loadMe()
+loadStats()
+loadEvents()
+setInterval(()=>{loadStats();loadEvents();updateGauges()},3000)
+</script>
+</body>
+</html>

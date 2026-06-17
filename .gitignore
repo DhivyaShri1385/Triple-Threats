@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Models (too large for git)
+models/anomaly_model.pkl
+models/scaler.pkl
+
+# Database and encryption key (sensitive)
+data/login_events.db
+data/fernet.key
+
+# Environment and secrets
+.env
+*.env
+config.py
+
+# Alert system credentials (IMPORTANT - hide your gmail password)
+alert_system.py
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini

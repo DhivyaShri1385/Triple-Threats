@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>UEBA — Secure Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#00ff41;--green2:#00cc33;--green3:#008f11;
+  --bg:#0d0d0d;--red:#ff0040;--yellow:#ffff00;
+  --font:'Courier New',monospace;
+}
+body{
+  background:var(--bg);color:var(--green);
+  font-family:var(--font);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px
+  );pointer-events:none;
+}
+#matrix{position:fixed;inset:0;opacity:.06;z-index:0}
+.terminal{position:relative;z-index:1;width:100%;max-width:520px;padding:20px}
+.term-header{
+  background:#000;border:1px solid #00ff4130;border-bottom:none;
+  padding:8px 16px;border-radius:6px 6px 0 0;
+  display:flex;align-items:center;gap:8px;
+}
+.dot{width:10px;height:10px;border-radius:50%}
+.term-title{margin:0 auto;font-size:12px;color:#444;letter-spacing:2px}
+.term-body{
+  border:1px solid #00ff4130;background:#000;
+  padding:24px;border-radius:0 0 6px 6px;
+}
+.ascii-art{
+  text-align:center;font-size:10px;color:#008f11;
+  line-height:1.2;margin-bottom:20px;white-space:pre;
+}
+.prompt-line{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:16px;font-size:13px;
+}
+.prompt{color:#008f11}
+.blink{animation:blink .8s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.behavior-panel{
+  border:1px solid #00ff4130;padding:12px;
+  margin:16px 0;border-radius:4px;background:#050505;
+}
+.bpanel-title{font-size:10px;color:#008f11;letter-spacing:2px;margin-bottom:10px}
+.meter-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.meter-label{width:120px;color:#3a7a3a;font-size:10px}
+.meter-bar{flex:1;height:6px;background:#0a1a0a;border:1px solid #0d2b0d;overflow:hidden}
+.meter-fill{height:100%;border-radius:2px;transition:width .3s ease;width:0%}
+.meter-val{width:40px;text-align:right;color:var(--green);font-size:10px}
+.input-wrap{position:relative;margin-bottom:14px}
+.input-wrap label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#008f11;margin-bottom:4px}
+.term-input{
+  width:100%;background:transparent;border:none;
+  border-bottom:1px solid #008f11;color:var(--green);
+  font-family:var(--font);font-size:14px;
+  padding:6px 0;outline:none;caret-color:var(--green);
+}
+.term-input::placeholder{color:#1a4d1a}
+.threat-box{
+  border:1px solid #00ff4130;padding:10px 14px;margin:14px 0;
+  border-radius:4px;display:flex;align-items:center;gap:12px;
+  background:#050505;transition:.3s;
+}
+.threat-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.threat-text{font-size:12px;color:#3a7a3a;flex:1}
+.threat-level{font-size:11px;letter-spacing:2px;color:var(--green)}
+.btn-login{
+  width:100%;background:transparent;border:1px solid var(--green);
+  color:var(--green);font-family:var(--font);font-size:14px;
+  padding:12px;cursor:pointer;letter-spacing:3px;
+  transition:.2s;text-transform:uppercase;border-radius:2px;
+  margin-bottom:12px;
+}
+.btn-login:hover{background:var(--green);color:#000;box-shadow:0 0 20px var(--green)}
+.btn-login:disabled{opacity:.4;cursor:not-allowed}
+.error-msg{color:var(--red);font-size:12px;margin:8px 0;display:none}
+.error-msg.show{display:block}
+.log-area{font-size:11px;color:#1a5c1a;max-height:80px;overflow-y:auto}
+.log-line{margin-bottom:2px}
+.log-line.warn{color:var(--yellow)}
+.log-line.error{color:var(--red)}
+.log-line.ok{color:var(--green)}
+.demo-creds{margin-top:16px;border-top:1px solid #0d2b0d;padding-top:12px;font-size:11px;color:#1a4d1a}
+.demo-row{display:flex;justify-content:space-between;padding:4px 0;cursor:pointer;border-bottom:1px solid #0a1a0a}
+.demo-row:hover{color:var(--green)}
+</style>
+</head>
+<body>
+<canvas id="matrix"></canvas>
+
+<div class="terminal">
+  <div class="term-header">
+    <div class="dot" style="background:#ff5f56"></div>
+    <div class="dot" style="background:#ffbd2e"></div>
+    <div class="dot" style="background:#27c93f"></div>
+    <div class="term-title">UEBA-TERMINAL v2.0 — BEHAVIORAL AUTH</div>
+  </div>
+
+  <div class="term-body">
+    <div class="ascii-art">
+ _   _ ___ ____    _
+| | | | __| __ )  / \
+| | | | _||  _ \ / _ \
+| |_| | |__| |_) / ___ \
+ \___/|____|____/_/   \_\</div>
+
+    <div class="prompt-line">
+      <span class="prompt">root@ueba-soc:~$</span>
+      <span>Initializing behavioral authentication</span>
+      <span class="blink">_</span>
+    </div>
+
+    <div class="behavior-panel">
+      <div class="bpanel-title">[ BEHAVIORAL BIOMETRICS — LIVE CAPTURE ]</div>
+      <div class="meter-row">
+        <span class="meter-label">Keystroke rhythm</span>
+        <div class="meter-bar"><div class="meter-fill" id="m-rhythm" style="background:#00cc33"></div></div>
+        <span class="meter-val" id="v-rhythm">0%</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Typing speed</span>
+        <div class="meter-bar"><div class="meter-fill" id="m-speed" style="background:#00cc33"></div></div>
+        <span class="meter-val" id="v-speed">0</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Mouse velocity</span>
+        <div class="meter-bar"><div class="meter-fill" id="m-mouse" style="background:#00cc33"></div></div>
+        <span class="meter-val" id="v-mouse">0</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Hesitations</span>
+        <div class="meter-bar"><div class="meter-fill" id="m-hesit" style="background:#ff9900"></div></div>
+        <span class="meter-val" id="v-hesit">0</span>
+      </div>
+      <div class="meter-row">
+        <span class="meter-label">Bot signals</span>
+        <div class="meter-bar"><div class="meter-fill" id="m-bot" style="background:#ff0040"></div></div>
+        <span class="meter-val" id="v-bot">0%</span>
+      </div>
+    </div>
+
+    <div class="input-wrap">
+      <label>> USERNAME:</label>
+      <input class="term-input" id="username" type="text" placeholder="enter username..." autocomplete="off"/>
+    </div>
+    <div class="input-wrap">
+      <label>> PASSWORD:</label>
+      <input class="term-input" id="password" type="password" placeholder="enter password..." autocomplete="off"/>
+    </div>
+
+    <div class="threat-box" id="threatBox">
+      <div class="threat-dot" id="threatDot"></div>
+      <span class="threat-text" id="threatText">Awaiting input...</span>
+      <span class="threat-level" id="threatLevel">STANDBY</span>
+    </div>
+
+    <div class="error-msg" id="errMsg"></div>
+
+    <button class="btn-login" id="loginBtn" onclick="submitLogin()">[ AUTHENTICATE ]</button>
+
+    <div class="log-area" id="logArea"></div>
+
+    <div class="demo-creds">
+      <div style="margin-bottom:6px;letter-spacing:1px">> DEMO CREDENTIALS:</div>
+      <div class="demo-row" onclick="fill('admin','admin@2024')">
+        <span>admin</span><span>admin@2024</span><span style="color:#008f11">ADMIN</span>
+      </div>
+      <div class="demo-row" onclick="fill('analyst','analyst@2024')">
+        <span>analyst</span><span>analyst@2024</span><span style="color:#008f11">ANALYST</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Matrix rain
+const canvas = document.getElementById('matrix')
+const ctx    = canvas.getContext('2d')
+canvas.width = window.innerWidth
+canvas.height= window.innerHeight
+const cols   = Math.floor(canvas.width / 16)
+const drops  = Array(cols).fill(1)
+const chars  = '01アイウエオABCDEF0123456789'
+function drawMatrix(){
+  ctx.fillStyle='rgba(0,0,0,.05)'
+  ctx.fillRect(0,0,canvas.width,canvas.height)
+  ctx.fillStyle='#00ff41'
+  ctx.font='14px monospace'
+  drops.forEach((y,i)=>{
+    const ch=chars[Math.floor(Math.random()*chars.length)]
+    ctx.fillText(ch,i*16,y*16)
+    if(y*16>canvas.height&&Math.random()>.975)drops[i]=0
+    drops[i]++
+  })
+}
+setInterval(drawMatrix,50)
+
+// Behavioral capture
+const keystrokes=[]
+const mouseMoves=[]
+const clicks=[]
+let attemptNum=1
+
+const device={
+  user_agent     : navigator.userAgent,
+  screen_width   : screen.width,
+  screen_height  : screen.height,
+  timezone_offset: new Date().getTimezoneOffset(),
+  languages      : navigator.languages?.join(',')||navigator.language,
+  plugin_count   : navigator.plugins?.length||0,
+  touch_support  : 'ontouchstart' in window,
+  color_depth    : screen.colorDepth,
+  cpu_cores      : navigator.hardwareConcurrency||4,
+}
+
+document.addEventListener('keydown',e=>{
+  keystrokes.push({key:e.key,press_time:Date.now(),release_time:null})
+})
+document.addEventListener('keyup',e=>{
+  const last=keystrokes.findLast(k=>k.key===e.key&&!k.release_time)
+  if(last)last.release_time=Date.now()
+})
+document.addEventListener('mousemove',e=>{
+  mouseMoves.push({x:e.clientX,y:e.clientY,t:Date.now()})
+  if(mouseMoves.length>200)mouseMoves.shift()
+  const recent=mouseMoves.slice(-10)
+  if(recent.length<2)return
+  let totalVel=0
+  for(let i=1;i<recent.length;i++){
+    const dx=recent[i].x-recent[i-1].x
+    const dy=recent[i].y-recent[i-1].y
+    const dt=(recent[i].t-recent[i-1].t)/1000||.001
+    totalVel+=Math.sqrt(dx*dx+dy*dy)/dt
+  }
+  const avgVel=totalVel/(recent.length-1)
+  setMeter('m-mouse','v-mouse',Math.min(avgVel/10,100),Math.round(avgVel))
+})
+document.addEventListener('click',e=>{
+  clicks.push({x:e.clientX,y:e.clientY,t:Date.now(),button:e.button})
+})
+
+function updateKeystrokeMeter(){
+  const done=keystrokes.filter(k=>k.release_time)
+  if(done.length<2)return
+  const dwells=done.map(k=>k.release_time-k.press_time)
+  const mean=dwells.reduce((a,b)=>a+b,0)/dwells.length
+  const std=Math.sqrt(dwells.map(d=>(d-mean)**2).reduce((a,b)=>a+b,0)/dwells.length)
+  const rhythm=Math.max(0,1-std/(mean+1))*100
+  setMeter('m-rhythm','v-rhythm',rhythm,Math.round(rhythm)+'%')
+  setMeter('m-speed','v-speed',Math.min(done.length*3,100),done.length+' keys')
+}
+
+document.getElementById('username').addEventListener('input',updateKeystrokeMeter)
+document.getElementById('password').addEventListener('input',updateKeystrokeMeter)
+
+function setMeter(barId,valId,pct,label){
+  const bar=document.getElementById(barId)
+  const val=document.getElementById(valId)
+  if(bar)bar.style.width=Math.min(pct,100)+'%'
+  if(val)val.textContent=label
+}
+
+let analysisTimer=null
+function startAnalysis(){
+  if(analysisTimer)return
+  analysisTimer=setInterval(analyzeNow,2000)
+}
+document.getElementById('username').addEventListener('focus',startAnalysis)
+document.getElementById('password').addEventListener('focus',startAnalysis)
+
+async function analyzeNow(){
+  const username=document.getElementById('username').value
+  if(!username&&keystrokes.length<3)return
+  try{
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        username,
+        keystrokes:keystrokes.slice(-50),
+        mouse_moves:mouseMoves.slice(-50),
+        clicks,device,
+        attempt_number:attemptNum,
+      })
+    })
+    const data=await res.json()
+    updateThreat(data)
+  }catch(e){}
+}
+
+const COLORS={CRITICAL:'#ff0040',HIGH:'#ff4444',MEDIUM:'#ff9900',LOW:'#ffff00',NORMAL:'#00ff41',LEARNING:'#00d4ff'}
+function updateThreat(data){
+  const col=COLORS[data.threat_level]||'#00ff41'
+  const dot=document.getElementById('threatDot')
+  const text=document.getElementById('threatText')
+  const level=document.getElementById('threatLevel')
+  const box=document.getElementById('threatBox')
+  if(dot){dot.style.background=col;dot.style.boxShadow=`0 0 8px ${col}`}
+  if(level){level.style.color=col;level.textContent=data.threat_level}
+  if(text)text.textContent=data.message||'Analyzing...'
+  if(box)box.style.borderColor=col+'60'
+  if(data.features){
+    const bot=(data.features.headless_signals||0)*25
+    setMeter('m-bot','v-bot',bot,bot+'%')
+    setMeter('m-hesit','v-hesit',Math.min((data.features.hesitations||0)*20,100),data.features.hesitations||0)
+  }
+  addLog(`[${data.timestamp||'--:--:--'}] SCORE:${data.anomaly_score||'?'} THREAT:${data.threat_level}`,data.is_anomaly?'warn':'ok')
+}
+
+function addLog(msg,type=''){
+  const area=document.getElementById('logArea')
+  const line=document.createElement('div')
+  line.className=`log-line ${type}`
+  line.textContent='> '+msg
+  area.appendChild(line)
+  area.scrollTop=area.scrollHeight
+  if(area.children.length>20)area.removeChild(area.firstChild)
+}
+
+async function submitLogin(){
+  const username=document.getElementById('username').value.trim()
+  const password=document.getElementById('password').value
+  const btn=document.getElementById('loginBtn')
+  const err=document.getElementById('errMsg')
+  err.classList.remove('show')
+  if(!username||!password){err.textContent='> ERROR: Username and password required';err.classList.add('show');return}
+  btn.disabled=true
+  btn.textContent='[ AUTHENTICATING... ]'
+  addLog('Submitting credentials...')
+  try{
+    const res=await fetch('/api/login_submit',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    })
+    const data=await res.json()
+    if(data.success){
+      addLog('Authentication successful — redirecting...','ok')
+      btn.textContent='[ ACCESS GRANTED ]'
+      btn.style.background='#00ff41'
+      btn.style.color='#000'
+      setTimeout(()=>{window.location.href='/dashboard'},800)
+    }else{
+      attemptNum++
+      err.textContent='> ERROR: '+(data.error||'Authentication failed')
+      err.classList.add('show')
+      btn.disabled=false
+      btn.textContent='[ AUTHENTICATE ]'
+      addLog(`Failed attempt #${attemptNum}`,'error')
+      analyzeNow()
+    }
+  }catch(e){
+    err.textContent='> ERROR: Server unreachable'
+    err.classList.add('show')
+    btn.disabled=false
+    btn.textContent='[ AUTHENTICATE ]'
+  }
+}
+
+function fill(u,p){
+  document.getElementById('username').value=u
+  document.getElementById('password').value=p
+  addLog(`Demo credentials loaded: ${u}`,'ok')
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter')submitLogin()})
+
+addLog('System initialized — behavioral capture active','ok')
+addLog('Keystroke dynamics: ENABLED','ok')
+addLog('Mouse analytics: ENABLED','ok')
+addLog('Device fingerprint: ENABLED','ok')
+</script>
+</body>
+</html>
