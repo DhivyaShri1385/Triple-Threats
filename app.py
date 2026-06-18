@@ -89,8 +89,19 @@ def analyze():
         import numpy as np
         features = np.zeros(25)
 
-    result = detector.score(features)
-
+    is_submit = attempt_num > 0 and len(keystroke_data) > 5
+    if is_submit:
+        result = detector.score(features, username=username)
+    else:
+        result = {
+            'status'        : 'monitoring',
+            'anomaly_score' : None,
+            'is_anomaly'    : False,
+            'threat_level'  : 'LEARNING',
+            'confidence'    : 0,
+            'message'       : 'Monitoring behavior...',
+        }
+        
     result['ip_hash']        = sha256(ip)
     result['username_hash']  = sha256(username)
     result['timestamp']      = datetime.now().strftime('%H:%M:%S')

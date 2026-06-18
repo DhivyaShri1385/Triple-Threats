@@ -3,225 +3,240 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UEBA — Secure Login</title>
+<title>UEBA Platform — Sign In</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --green:#00ff41;--green2:#00cc33;--green3:#008f11;
-  --bg:#0d0d0d;--red:#ff0040;--yellow:#ffff00;
-  --font:'Courier New',monospace;
+  --navy:#0b1120;--navy2:#111827;--navy3:#1a2540;
+  --blue:#2563eb;--blue2:#1d4ed8;--blue3:#3b82f6;
+  --accent:#06b6d4;--text:#f1f5f9;--muted:#94a3b8;
+  --border:#1e3a5f;--danger:#ef4444;--success:#10b981;
+  --font:'Inter',system-ui,sans-serif;
 }
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-  background:var(--bg);color:var(--green);
-  font-family:var(--font);min-height:100vh;
+  background:var(--navy);font-family:var(--font);
+  min-height:100vh;display:flex;color:var(--text);
+}
+.left-panel{
+  width:55%;
+  background:linear-gradient(135deg,#0b1120 0%,#0f1e35 50%,#0b1628 100%);
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:48px;position:relative;overflow:hidden;
+}
+.left-panel::before{
+  content:'';position:absolute;width:600px;height:600px;
+  background:radial-gradient(circle,rgba(37,99,235,.12) 0%,transparent 70%);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.left-panel::after{
+  content:'';position:absolute;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(6,182,212,.08) 0%,transparent 70%);
+  bottom:-50px;left:-50px;pointer-events:none;
+}
+.brand{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.brand-icon{
+  width:40px;height:40px;
+  background:linear-gradient(135deg,var(--blue),var(--accent));
+  border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;
+}
+.brand-name{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.brand-tag{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.hero{position:relative;z-index:1}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);
+  padding:6px 14px;border-radius:20px;font-size:12px;
+  color:var(--blue3);letter-spacing:.5px;margin-bottom:24px;
+}
+.hero-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{
+  font-size:40px;font-weight:700;line-height:1.15;
+  letter-spacing:-.5px;margin-bottom:16px;
+}
+.hero h1 span{
+  background:linear-gradient(90deg,var(--blue3),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{font-size:16px;color:var(--muted);line-height:1.7;max-width:380px}
+.stats{display:flex;gap:32px;position:relative;z-index:1}
+.stat-val{font-size:24px;font-weight:700}
+.stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+.right-panel{
+  width:45%;background:var(--navy2);
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
+  padding:48px;border-left:1px solid var(--border);
 }
-body::after{
-  content:'';position:fixed;inset:0;
-  background:repeating-linear-gradient(
-    0deg,transparent,transparent 2px,
-    rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px
-  );pointer-events:none;
+.login-box{width:100%;max-width:380px}
+.login-title{font-size:24px;font-weight:700;margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.behavior-indicator{
+  background:var(--navy3);border:1px solid var(--border);
+  border-radius:8px;padding:12px 16px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;
 }
-#matrix{position:fixed;inset:0;opacity:.06;z-index:0}
-.terminal{position:relative;z-index:1;width:100%;max-width:520px;padding:20px}
-.term-header{
-  background:#000;border:1px solid #00ff4130;border-bottom:none;
-  padding:8px 16px;border-radius:6px 6px 0 0;
-  display:flex;align-items:center;gap:8px;
+.bi-left{display:flex;align-items:center;gap:10px}
+.bi-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--success);box-shadow:0 0 6px var(--success);
 }
-.dot{width:10px;height:10px;border-radius:50%}
-.term-title{margin:0 auto;font-size:12px;color:#444;letter-spacing:2px}
-.term-body{
-  border:1px solid #00ff4130;background:#000;
-  padding:24px;border-radius:0 0 6px 6px;
+.bi-label{font-size:12px;color:var(--muted)}
+.bi-status{font-size:12px;font-weight:600;color:var(--success)}
+.bi-score{font-size:11px;color:var(--muted);font-family:monospace}
+.error-box{
+  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+  color:#fca5a5;padding:12px 16px;border-radius:8px;
+  font-size:13px;margin-bottom:16px;display:none;
 }
-.ascii-art{
-  text-align:center;font-size:10px;color:#008f11;
-  line-height:1.2;margin-bottom:20px;white-space:pre;
+.error-box.show{display:block}
+.form-group{margin-bottom:20px}
+.form-group label{
+  display:block;font-size:13px;font-weight:500;
+  color:var(--muted);margin-bottom:8px;
 }
-.prompt-line{
-  display:flex;align-items:center;gap:8px;
-  margin-bottom:16px;font-size:13px;
+.form-group input{
+  width:100%;background:var(--navy3);border:1px solid var(--border);
+  color:var(--text);padding:12px 16px;border-radius:8px;
+  font-size:14px;font-family:var(--font);outline:none;
+  transition:border-color .2s,box-shadow .2s;
 }
-.prompt{color:#008f11}
-.blink{animation:blink .8s infinite}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-.behavior-panel{
-  border:1px solid #00ff4130;padding:12px;
-  margin:16px 0;border-radius:4px;background:#050505;
+.form-group input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
 }
-.bpanel-title{font-size:10px;color:#008f11;letter-spacing:2px;margin-bottom:10px}
-.meter-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
-.meter-label{width:120px;color:#3a7a3a;font-size:10px}
-.meter-bar{flex:1;height:6px;background:#0a1a0a;border:1px solid #0d2b0d;overflow:hidden}
-.meter-fill{height:100%;border-radius:2px;transition:width .3s ease;width:0%}
-.meter-val{width:40px;text-align:right;color:var(--green);font-size:10px}
-.input-wrap{position:relative;margin-bottom:14px}
-.input-wrap label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#008f11;margin-bottom:4px}
-.term-input{
-  width:100%;background:transparent;border:none;
-  border-bottom:1px solid #008f11;color:var(--green);
-  font-family:var(--font);font-size:14px;
-  padding:6px 0;outline:none;caret-color:var(--green);
+.form-group input::placeholder{color:#334155}
+.input-icon-wrap{position:relative}
+.input-icon-wrap input{padding-right:44px}
+.input-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--muted);cursor:pointer;font-size:16px;
+  background:none;border:none;padding:0;
 }
-.term-input::placeholder{color:#1a4d1a}
-.threat-box{
-  border:1px solid #00ff4130;padding:10px 14px;margin:14px 0;
-  border-radius:4px;display:flex;align-items:center;gap:12px;
-  background:#050505;transition:.3s;
+.btn-signin{
+  width:100%;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#fff;border:none;padding:13px;border-radius:8px;
+  font-size:15px;font-weight:600;font-family:var(--font);
+  cursor:pointer;letter-spacing:.3px;transition:.2s;margin-top:8px;
 }
-.threat-dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
-.threat-text{font-size:12px;color:#3a7a3a;flex:1}
-.threat-level{font-size:11px;letter-spacing:2px;color:var(--green)}
-.btn-login{
-  width:100%;background:transparent;border:1px solid var(--green);
-  color:var(--green);font-family:var(--font);font-size:14px;
-  padding:12px;cursor:pointer;letter-spacing:3px;
-  transition:.2s;text-transform:uppercase;border-radius:2px;
-  margin-bottom:12px;
+.btn-signin:hover{
+  opacity:.92;transform:translateY(-1px);
+  box-shadow:0 4px 20px rgba(37,99,235,.4);
 }
-.btn-login:hover{background:var(--green);color:#000;box-shadow:0 0 20px var(--green)}
-.btn-login:disabled{opacity:.4;cursor:not-allowed}
-.error-msg{color:var(--red);font-size:12px;margin:8px 0;display:none}
-.error-msg.show{display:block}
-.log-area{font-size:11px;color:#1a5c1a;max-height:80px;overflow-y:auto}
-.log-line{margin-bottom:2px}
-.log-line.warn{color:var(--yellow)}
-.log-line.error{color:var(--red)}
-.log-line.ok{color:var(--green)}
-.demo-creds{margin-top:16px;border-top:1px solid #0d2b0d;padding-top:12px;font-size:11px;color:#1a4d1a}
-.demo-row{display:flex;justify-content:space-between;padding:4px 0;cursor:pointer;border-bottom:1px solid #0a1a0a}
-.demo-row:hover{color:var(--green)}
+.btn-signin:active{transform:translateY(0)}
+.btn-signin:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.security-badge{
+  display:flex;align-items:center;justify-content:center;
+  gap:20px;margin-top:28px;padding-top:24px;
+  border-top:1px solid var(--border);
+}
+.sec-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+@media(max-width:768px){
+  body{flex-direction:column}
+  .left-panel,.right-panel{width:100%;padding:32px 24px}
+  .right-panel{border-left:none;border-top:1px solid var(--border)}
+  .hero h1{font-size:28px}
+}
 </style>
 </head>
 <body>
-<canvas id="matrix"></canvas>
 
-<div class="terminal">
-  <div class="term-header">
-    <div class="dot" style="background:#ff5f56"></div>
-    <div class="dot" style="background:#ffbd2e"></div>
-    <div class="dot" style="background:#27c93f"></div>
-    <div class="term-title">UEBA-TERMINAL v2.0 — BEHAVIORAL AUTH</div>
+<div class="left-panel">
+  <div class="brand">
+    <div class="brand-icon">🛡</div>
+    <div>
+      <div class="brand-name">UEBA Platform</div>
+      <div class="brand-tag">Security Operations</div>
+    </div>
   </div>
 
-  <div class="term-body">
-    <div class="ascii-art">
- _   _ ___ ____    _
-| | | | __| __ )  / \
-| | | | _||  _ \ / _ \
-| |_| | |__| |_) / ___ \
- \___/|____|____/_/   \_\</div>
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="hero-dot"></span>
+      Real-time behavioral analytics
+    </div>
+    <h1>Detect threats<br>before they<br><span>cause damage</span></h1>
+    <p>Advanced user and entity behavior analytics powered by machine learning. Every login analyzed, every anomaly flagged, every threat contained.</p>
+  </div>
 
-    <div class="prompt-line">
-      <span class="prompt">root@ueba-soc:~$</span>
-      <span>Initializing behavioral authentication</span>
-      <span class="blink">_</span>
+  <div class="stats">
+    <div>
+      <div class="stat-val">99.6%</div>
+      <div class="stat-label">Detection accuracy</div>
+    </div>
+    <div>
+      <div class="stat-val">&lt;2s</div>
+      <div class="stat-label">Response time</div>
+    </div>
+    <div>
+      <div class="stat-val">25</div>
+      <div class="stat-label">Behavioral signals</div>
+    </div>
+  </div>
+</div>
+
+<div class="right-panel">
+  <div class="login-box">
+    <div class="login-title">Welcome back</div>
+    <div class="login-sub">Sign in to access your SOC dashboard</div>
+
+    <div class="behavior-indicator">
+      <div class="bi-left">
+        <div class="bi-dot" id="biDot"></div>
+        <div class="bi-label">Behavioral analysis</div>
+      </div>
+      <div style="text-align:right">
+        <div class="bi-status" id="biStatus">Monitoring</div>
+        <div class="bi-score" id="biScore">Score: —</div>
+      </div>
     </div>
 
-    <div class="behavior-panel">
-      <div class="bpanel-title">[ BEHAVIORAL BIOMETRICS — LIVE CAPTURE ]</div>
-      <div class="meter-row">
-        <span class="meter-label">Keystroke rhythm</span>
-        <div class="meter-bar"><div class="meter-fill" id="m-rhythm" style="background:#00cc33"></div></div>
-        <span class="meter-val" id="v-rhythm">0%</span>
-      </div>
-      <div class="meter-row">
-        <span class="meter-label">Typing speed</span>
-        <div class="meter-bar"><div class="meter-fill" id="m-speed" style="background:#00cc33"></div></div>
-        <span class="meter-val" id="v-speed">0</span>
-      </div>
-      <div class="meter-row">
-        <span class="meter-label">Mouse velocity</span>
-        <div class="meter-bar"><div class="meter-fill" id="m-mouse" style="background:#00cc33"></div></div>
-        <span class="meter-val" id="v-mouse">0</span>
-      </div>
-      <div class="meter-row">
-        <span class="meter-label">Hesitations</span>
-        <div class="meter-bar"><div class="meter-fill" id="m-hesit" style="background:#ff9900"></div></div>
-        <span class="meter-val" id="v-hesit">0</span>
-      </div>
-      <div class="meter-row">
-        <span class="meter-label">Bot signals</span>
-        <div class="meter-bar"><div class="meter-fill" id="m-bot" style="background:#ff0040"></div></div>
-        <span class="meter-val" id="v-bot">0%</span>
+    <div class="error-box" id="errBox"></div>
+
+    <div class="form-group">
+      <label>Username</label>
+      <input id="username" type="text" placeholder="Enter your username" autocomplete="username"/>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-icon-wrap">
+        <input id="password" type="password" placeholder="Enter your password" autocomplete="current-password"/>
+        <button class="input-icon" onclick="togglePass()" tabindex="-1">👁</button>
       </div>
     </div>
 
-    <div class="input-wrap">
-      <label>> USERNAME:</label>
-      <input class="term-input" id="username" type="text" placeholder="enter username..." autocomplete="off"/>
-    </div>
-    <div class="input-wrap">
-      <label>> PASSWORD:</label>
-      <input class="term-input" id="password" type="password" placeholder="enter password..." autocomplete="off"/>
-    </div>
+    <button class="btn-signin" id="signinBtn" onclick="doLogin()">
+      Sign in to dashboard
+    </button>
 
-    <div class="threat-box" id="threatBox">
-      <div class="threat-dot" id="threatDot"></div>
-      <span class="threat-text" id="threatText">Awaiting input...</span>
-      <span class="threat-level" id="threatLevel">STANDBY</span>
-    </div>
-
-    <div class="error-msg" id="errMsg"></div>
-
-    <button class="btn-login" id="loginBtn" onclick="submitLogin()">[ AUTHENTICATE ]</button>
-
-    <div class="log-area" id="logArea"></div>
-
-    <div class="demo-creds">
-      <div style="margin-bottom:6px;letter-spacing:1px">> DEMO CREDENTIALS:</div>
-      <div class="demo-row" onclick="fill('admin','admin@2024')">
-        <span>admin</span><span>admin@2024</span><span style="color:#008f11">ADMIN</span>
-      </div>
-      <div class="demo-row" onclick="fill('analyst','analyst@2024')">
-        <span>analyst</span><span>analyst@2024</span><span style="color:#008f11">ANALYST</span>
-      </div>
+    <div class="security-badge">
+      <div class="sec-item">🔒 SHA-256 encrypted</div>
+      <div class="sec-item">🛡 AES-256 storage</div>
+      <div class="sec-item">✓ GDPR compliant</div>
     </div>
   </div>
 </div>
 
 <script>
-// Matrix rain
-const canvas = document.getElementById('matrix')
-const ctx    = canvas.getContext('2d')
-canvas.width = window.innerWidth
-canvas.height= window.innerHeight
-const cols   = Math.floor(canvas.width / 16)
-const drops  = Array(cols).fill(1)
-const chars  = '01アイウエオABCDEF0123456789'
-function drawMatrix(){
-  ctx.fillStyle='rgba(0,0,0,.05)'
-  ctx.fillRect(0,0,canvas.width,canvas.height)
-  ctx.fillStyle='#00ff41'
-  ctx.font='14px monospace'
-  drops.forEach((y,i)=>{
-    const ch=chars[Math.floor(Math.random()*chars.length)]
-    ctx.fillText(ch,i*16,y*16)
-    if(y*16>canvas.height&&Math.random()>.975)drops[i]=0
-    drops[i]++
-  })
-}
-setInterval(drawMatrix,50)
-
-// Behavioral capture
-const keystrokes=[]
-const mouseMoves=[]
-const clicks=[]
-let attemptNum=1
+const keystrokes=[],mouseMoves=[],clicks=[]
+let attemptNum=1,analysisTimer=null
 
 const device={
-  user_agent     : navigator.userAgent,
-  screen_width   : screen.width,
-  screen_height  : screen.height,
-  timezone_offset: new Date().getTimezoneOffset(),
-  languages      : navigator.languages?.join(',')||navigator.language,
-  plugin_count   : navigator.plugins?.length||0,
-  touch_support  : 'ontouchstart' in window,
-  color_depth    : screen.colorDepth,
-  cpu_cores      : navigator.hardwareConcurrency||4,
+  user_agent:navigator.userAgent,
+  screen_width:screen.width,screen_height:screen.height,
+  timezone_offset:new Date().getTimezoneOffset(),
+  languages:navigator.languages?.join(',')||navigator.language,
+  plugin_count:navigator.plugins?.length||0,
+  touch_support:'ontouchstart' in window,
+  color_depth:screen.colorDepth,
+  cpu_cores:navigator.hardwareConcurrency||4,
 }
 
 document.addEventListener('keydown',e=>{
@@ -234,152 +249,101 @@ document.addEventListener('keyup',e=>{
 document.addEventListener('mousemove',e=>{
   mouseMoves.push({x:e.clientX,y:e.clientY,t:Date.now()})
   if(mouseMoves.length>200)mouseMoves.shift()
-  const recent=mouseMoves.slice(-10)
-  if(recent.length<2)return
-  let totalVel=0
-  for(let i=1;i<recent.length;i++){
-    const dx=recent[i].x-recent[i-1].x
-    const dy=recent[i].y-recent[i-1].y
-    const dt=(recent[i].t-recent[i-1].t)/1000||.001
-    totalVel+=Math.sqrt(dx*dx+dy*dy)/dt
-  }
-  const avgVel=totalVel/(recent.length-1)
-  setMeter('m-mouse','v-mouse',Math.min(avgVel/10,100),Math.round(avgVel))
 })
 document.addEventListener('click',e=>{
   clicks.push({x:e.clientX,y:e.clientY,t:Date.now(),button:e.button})
 })
 
-function updateKeystrokeMeter(){
-  const done=keystrokes.filter(k=>k.release_time)
-  if(done.length<2)return
-  const dwells=done.map(k=>k.release_time-k.press_time)
-  const mean=dwells.reduce((a,b)=>a+b,0)/dwells.length
-  const std=Math.sqrt(dwells.map(d=>(d-mean)**2).reduce((a,b)=>a+b,0)/dwells.length)
-  const rhythm=Math.max(0,1-std/(mean+1))*100
-  setMeter('m-rhythm','v-rhythm',rhythm,Math.round(rhythm)+'%')
-  setMeter('m-speed','v-speed',Math.min(done.length*3,100),done.length+' keys')
-}
-
-document.getElementById('username').addEventListener('input',updateKeystrokeMeter)
-document.getElementById('password').addEventListener('input',updateKeystrokeMeter)
-
-function setMeter(barId,valId,pct,label){
-  const bar=document.getElementById(barId)
-  const val=document.getElementById(valId)
-  if(bar)bar.style.width=Math.min(pct,100)+'%'
-  if(val)val.textContent=label
-}
-
-let analysisTimer=null
 function startAnalysis(){
   if(analysisTimer)return
-  analysisTimer=setInterval(analyzeNow,2000)
+  analysisTimer=setInterval(analyzeNow,30000)
 }
 document.getElementById('username').addEventListener('focus',startAnalysis)
 document.getElementById('password').addEventListener('focus',startAnalysis)
 
+const THREAT_COLORS={
+  CRITICAL:'#ef4444',HIGH:'#f97316',MEDIUM:'#f59e0b',
+  LOW:'#10b981',NORMAL:'#10b981',LEARNING:'#06b6d4'
+}
+
 async function analyzeNow(){
   const username=document.getElementById('username').value
-  if(!username&&keystrokes.length<3)return
+  if(!username&&keystrokes.length<2)return
   try{
     const res=await fetch('/api/analyze',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        username,
-        keystrokes:keystrokes.slice(-50),
-        mouse_moves:mouseMoves.slice(-50),
-        clicks,device,
+        username,keystrokes:keystrokes.slice(-50),
+        mouse_moves:mouseMoves.slice(-50),clicks,device,
         attempt_number:attemptNum,
       })
     })
     const data=await res.json()
-    updateThreat(data)
+    updateIndicator(data)
   }catch(e){}
 }
 
-const COLORS={CRITICAL:'#ff0040',HIGH:'#ff4444',MEDIUM:'#ff9900',LOW:'#ffff00',NORMAL:'#00ff41',LEARNING:'#00d4ff'}
-function updateThreat(data){
-  const col=COLORS[data.threat_level]||'#00ff41'
-  const dot=document.getElementById('threatDot')
-  const text=document.getElementById('threatText')
-  const level=document.getElementById('threatLevel')
-  const box=document.getElementById('threatBox')
-  if(dot){dot.style.background=col;dot.style.boxShadow=`0 0 8px ${col}`}
-  if(level){level.style.color=col;level.textContent=data.threat_level}
-  if(text)text.textContent=data.message||'Analyzing...'
-  if(box)box.style.borderColor=col+'60'
-  if(data.features){
-    const bot=(data.features.headless_signals||0)*25
-    setMeter('m-bot','v-bot',bot,bot+'%')
-    setMeter('m-hesit','v-hesit',Math.min((data.features.hesitations||0)*20,100),data.features.hesitations||0)
+function updateIndicator(data){
+  const col=THREAT_COLORS[data.threat_level]||'#10b981'
+  const dot=document.getElementById('biDot')
+  const status=document.getElementById('biStatus')
+  const score=document.getElementById('biScore')
+  if(dot){dot.style.background=col;dot.style.boxShadow=`0 0 6px ${col}`}
+  if(status){
+    status.style.color=col
+    status.textContent={
+      LEARNING:'Learning baseline',NORMAL:'Normal',
+      LOW:'Low risk',MEDIUM:'Monitoring',
+      HIGH:'Elevated risk',CRITICAL:'Anomaly detected'
+    }[data.threat_level]||'Analyzing'
   }
-  addLog(`[${data.timestamp||'--:--:--'}] SCORE:${data.anomaly_score||'?'} THREAT:${data.threat_level}`,data.is_anomaly?'warn':'ok')
+  if(score)score.textContent=data.anomaly_score?`Score: ${data.anomaly_score}`:'Score: —'
 }
 
-function addLog(msg,type=''){
-  const area=document.getElementById('logArea')
-  const line=document.createElement('div')
-  line.className=`log-line ${type}`
-  line.textContent='> '+msg
-  area.appendChild(line)
-  area.scrollTop=area.scrollHeight
-  if(area.children.length>20)area.removeChild(area.firstChild)
+function togglePass(){
+  const p=document.getElementById('password')
+  p.type=p.type==='password'?'text':'password'
 }
 
-async function submitLogin(){
+async function doLogin(){
   const username=document.getElementById('username').value.trim()
   const password=document.getElementById('password').value
-  const btn=document.getElementById('loginBtn')
-  const err=document.getElementById('errMsg')
+  const btn=document.getElementById('signinBtn')
+  const err=document.getElementById('errBox')
   err.classList.remove('show')
-  if(!username||!password){err.textContent='> ERROR: Username and password required';err.classList.add('show');return}
+  if(!username||!password){showErr('Please enter your username and password');return}
   btn.disabled=true
-  btn.textContent='[ AUTHENTICATING... ]'
-  addLog('Submitting credentials...')
+  btn.textContent='Signing in...'
   try{
     const res=await fetch('/api/login_submit',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({username,password})
     })
     const data=await res.json()
     if(data.success){
-      addLog('Authentication successful — redirecting...','ok')
-      btn.textContent='[ ACCESS GRANTED ]'
-      btn.style.background='#00ff41'
-      btn.style.color='#000'
-      setTimeout(()=>{window.location.href='/dashboard'},800)
+      btn.textContent='Access granted — redirecting...'
+      btn.style.background='linear-gradient(135deg,#10b981,#059669)'
+      setTimeout(()=>{window.location.href='/dashboard'},700)
     }else{
       attemptNum++
-      err.textContent='> ERROR: '+(data.error||'Authentication failed')
-      err.classList.add('show')
+      showErr('Invalid username or password. Please try again.')
       btn.disabled=false
-      btn.textContent='[ AUTHENTICATE ]'
-      addLog(`Failed attempt #${attemptNum}`,'error')
+      btn.textContent='Sign in to dashboard'
       analyzeNow()
     }
   }catch(e){
-    err.textContent='> ERROR: Server unreachable'
-    err.classList.add('show')
+    showErr('Unable to connect. Please try again.')
     btn.disabled=false
-    btn.textContent='[ AUTHENTICATE ]'
+    btn.textContent='Sign in to dashboard'
   }
 }
 
-function fill(u,p){
-  document.getElementById('username').value=u
-  document.getElementById('password').value=p
-  addLog(`Demo credentials loaded: ${u}`,'ok')
+function showErr(msg){
+  const e=document.getElementById('errBox')
+  e.textContent=msg;e.classList.add('show')
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Enter')submitLogin()})
-
-addLog('System initialized — behavioral capture active','ok')
-addLog('Keystroke dynamics: ENABLED','ok')
-addLog('Mouse analytics: ENABLED','ok')
-addLog('Device fingerprint: ENABLED','ok')
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()})
 </script>
 </body>
 </html>
