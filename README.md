@@ -265,7 +265,7 @@ ueba_project/
 | Priyanka P | Security Analyst — encryption, report |
 | Aishwaraya V | UI/UX — frontend, presentation |
 
-**Project Tutor:** Abishek Choriya
+**Project Tutor:** Abhishek Chouriya
 
 **College:** M.Kumarasamy College Of Engineering
 **Domain:** Cybersecurity — Network Security / Behavioral Biometrics
