@@ -1,0 +1,278 @@
+# 🛡 Real-Time User Behavioral Analysis for Anomaly Detection
+
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Flask](https://img.shields.io/badge/Flask-3.0-green)
+![ML](https://img.shields.io/badge/ML-Isolation%20Forest-orange)
+![Security](https://img.shields.io/badge/Encryption-AES--256-red)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+A production-grade cybersecurity platform that detects anomalous login behavior in real time using machine learning — without any predefined dataset. The system captures 25 behavioral biometric signals per session and builds a per-user Isolation Forest model that detects impersonation, bot attacks, and brute force attempts automatically.
+
+---
+
+## 🚀 What Makes This Different
+
+| Traditional IDS | This Project |
+|---|---|
+| Predefined 2009 dataset (NSL-KDD) | Generates own real-time behavioral data |
+| Offline batch prediction | Real-time per-keystroke analysis |
+| Network packet features | Behavioral biometric features |
+| Static model | Self-learning per-user profiling |
+| No live UI | Professional SOC dashboard |
+
+---
+
+## ✨ Features
+
+- **25 behavioral signals** — keystroke dynamics, mouse behavior, device fingerprint
+- **Per-user Isolation Forest** — each user has their own behavioral baseline
+- **Real-time scoring** — every login session scored in under 2 seconds
+- **Impersonation detection** — correct password, wrong typing pattern = flagged
+- **Bot detection** — headless browser signals, zero hesitation patterns
+- **AES-256 encryption** — all session records encrypted at rest
+- **SHA-256 pseudonymization** — no raw identifiers stored anywhere
+- **Automated email alerts** — SMTP alert fires on CRITICAL detection
+- **Professional SOC dashboard** — live feed, charts, behavioral gauges
+- **PDF report download** — admin-only session report generation
+- **Brute force protection** — auto-block after 5 failed attempts
+- **GDPR compliant** — no raw personal data stored
+
+---
+
+## 🏗 System Architecture
+
+Login page (behavioral capture)
+
+↓
+
+25 features extracted
+
+(keystroke + mouse + device)
+
+↓
+
+SHA-256 pseudonymization
+
+↓
+
+Per-user Isolation Forest scoring
+
+↓
+
+┌─────────────────────────────┐
+
+│  NORMAL  → Session allowed  │
+
+│  LOW     → Logged           │
+
+│  MEDIUM  → Flagged          │
+
+│  HIGH    → Email alert      │
+
+│  CRITICAL→ Block + alert    │
+
+└─────────────────────────────┘
+
+↓
+
+AES-256 encrypted SQLite storage
+
+↓
+
+SOC dashboard live update
+
+---
+
+## 📊 Behavioral Features Captured
+
+### Keystroke Dynamics (8 features)
+- Dwell time mean and standard deviation
+- Flight time mean and standard deviation
+- Typing speed (keys per second)
+- Rhythm consistency
+- Error rate (backspace frequency)
+- Key count
+
+### Mouse Behavior (7 features)
+- Velocity mean and standard deviation
+- Acceleration
+- Click count
+- Hesitation count
+- Movement linearity
+- Double click speed
+
+### Device Fingerprint (10 features)
+- Screen width and height
+- Timezone offset
+- Language count
+- Plugin count
+- Touch support
+- Color depth
+- CPU cores
+- Device fingerprint hash
+- Headless browser signals
+
+---
+
+## 🔐 Security Implementation
+
+| Concept | Implementation |
+|---|---|
+| Confidentiality | SHA-256 pseudonymization + AES-256 Fernet encryption |
+| Integrity | Per-user behavioral verification on every login |
+| Availability | Brute force lockout + auto-block on CRITICAL |
+| Zero-day detection | Isolation Forest learns normal, flags unknown patterns |
+| GDPR compliance | No raw personal data stored anywhere |
+
+---
+
+## 🛠 Tech Stack
+
+| Category | Technology |
+|---|---|
+| Language | Python 3.12 |
+| Web framework | Flask 3.0 |
+| Machine learning | scikit-learn — Isolation Forest |
+| Encryption | cryptography — AES-256 Fernet |
+| Hashing | hashlib — SHA-256 |
+| Database | SQLite3 |
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| Charts | Chart.js 4.4 |
+| Email alerts | smtplib — Gmail SMTP |
+| Tunneling | ngrok 3.39 |
+| Version control | Git + GitHub |
+
+---
+
+## ⚙️ Setup and Installation
+
+### Prerequisites
+- Python 3.12+
+- pip
+
+### Install dependencies
+```bash
+pip install flask flask-cors scikit-learn numpy cryptography
+```
+
+### Configure email alerts
+```bash
+cp alert_system_template.py alert_system.py
+```
+Edit `alert_system.py` and fill in your Gmail credentials:
+```python
+SENDER_EMAIL   = "your_gmail@gmail.com"
+SENDER_PASS    = "your_16_char_app_password"
+RECEIVER_EMAIL = "your_gmail@gmail.com"
+```
+
+### Run the application
+```bash
+python app.py
+```
+
+Open `http://localhost:5000/login`
+
+---
+
+## 👥 Demo Credentials
+
+| Username | Password | Role |
+|---|---|---|
+| admin | admin@2024 | Administrator |
+| analyst | analyst@2024 | SOC Analyst |
+
+---
+
+## 📁 Project Structure
+ueba_project/
+
+├── app.py                      # Flask backend — 8 API endpoints
+
+├── behavior_tracker.py         # Real-time feature extraction
+
+├── ml_engine.py                # Per-user Isolation Forest engine
+
+├── database.py                 # AES-256 encrypted SQLite storage
+
+├── alert_system.py             # Email alert (excluded from git)
+
+├── alert_system_template.py    # Safe template for GitHub
+
+├── requirements.txt            # Python dependencies
+
+├── README.md                   # This file
+
+├── .gitignore                  # Excludes credentials and models
+
+├── templates/
+
+│   ├── login.html              # Professional dark navy login page
+
+│   └── dashboard.html          # SOC dashboard with live feed
+
+├── models/                     # Trained ML profiles (excluded)
+
+└── data/                       # SQLite DB and keys (excluded)
+
+---
+
+## 🔒 Security Notes
+
+- `alert_system.py` is excluded from git via `.gitignore` — contains Gmail credentials
+- `models/` directory excluded — contains trained behavioral profiles
+- `data/` directory excluded — contains encrypted database and Fernet key
+- Never commit real credentials to GitHub
+
+---
+
+## 🧪 Attack Scenarios Detected
+
+| Attack | Detection method | Response |
+|---|---|---|
+| Bot login | Zero hesitation, headless signals | CRITICAL — auto-block |
+| Brute force | 5+ failed attempts | IP blocked |
+| Impersonation | Different typing rhythm | HIGH/CRITICAL alert |
+| Credential stuffing | Identical pattern multiple users | Flagged |
+| Off-hours access | Device fingerprint mismatch | Anomaly scored |
+
+---
+
+## ⚠️ Limitations
+
+- Cold start — 30 sessions needed before detection activates
+- Behavioral drift — typing changes over time may cause false positives
+- Small training set — production systems use hundreds of sessions
+- Local deployment — requires ngrok for external access
+
+---
+
+## 🔮 Future Work
+
+- LSTM neural network for sequential temporal modeling
+- Federated learning for multi-organization deployment
+- Real-time packet capture with Scapy
+- Cloud deployment with TLS 1.3
+- JWT authentication for dashboard
+
+---
+
+## 👨‍💻 Team
+
+| Member | Role |
+|---|---|
+| Dhivya Shri S | ML Engineer — model, backend, deployment |
+| Priyanka P | Security Analyst — encryption, report |
+| Aishwaraya V | UI/UX — frontend, presentation |
+
+**Project Tutor:** Abishek Choriya
+
+**College:** M.Kumarasamy College Of Engineering
+**Domain:** Cybersecurity — Network Security / Behavioral Biometrics
+**Year:** 2025-2026
+
+---
+
+## 📄 License
+
+MIT License — free to use for educational purposes.
