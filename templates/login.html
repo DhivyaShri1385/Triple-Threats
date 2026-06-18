@@ -256,10 +256,11 @@ document.addEventListener('click',e=>{
 
 function startAnalysis(){
   if(analysisTimer)return
-  analysisTimer=setInterval(analyzeNow,30000)
+  analysisTimer=setInterval(analyzeNow,3000)
 }
 document.getElementById('username').addEventListener('focus',startAnalysis)
 document.getElementById('password').addEventListener('focus',startAnalysis)
+startAnalysis()
 
 const THREAT_COLORS={
   CRITICAL:'#ef4444',HIGH:'#f97316',MEDIUM:'#f59e0b',
@@ -268,13 +269,20 @@ const THREAT_COLORS={
 
 async function analyzeNow(){
   const username=document.getElementById('username').value
-  if(!username&&keystrokes.length<2)return
+  const password=document.getElementById('password').value
+  if(!username && !password) return
+  if(keystrokes.length < 5) return
+  const complete = keystrokes.filter(k=>k.release_time !== null)
+  if(complete.length < 3) return
   try{
     const res=await fetch('/api/analyze',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        username,keystrokes:keystrokes.slice(-50),
-        mouse_moves:mouseMoves.slice(-50),clicks,device,
+        username,
+        keystrokes:complete.slice(-50),
+        mouse_moves:mouseMoves.slice(-50),
+        clicks,device,
         attempt_number:attemptNum,
       })
     })

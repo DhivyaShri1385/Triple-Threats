@@ -5,8 +5,8 @@ from sklearn.ensemble import IsolationForest
 from sklearn.preprocessing import StandardScaler
 
 MODEL_DIR  = os.path.join(os.path.dirname(__file__), 'models')
-TRAINING_THRESHOLD = 15
-ANOMALY_THRESHOLD  = -0.25
+TRAINING_THRESHOLD = 30
+ANOMALY_THRESHOLD  = -0.4
 
 class UserBehaviorProfile:
     def __init__(self, username):
@@ -27,10 +27,10 @@ class UserBehaviorProfile:
         X        = np.array(self.training_data)
         self.scaler  = StandardScaler()
         X_scaled = self.scaler.fit_transform(X)
-        self.model   = IsolationForest(
-            n_estimators=100, contamination=0.15,max_samples=256, 
-            random_state=42, n_jobs=-1
-        )
+        self.model = IsolationForest(
+    n_estimators=200, contamination=0.05, max_samples='auto',
+    random_state=42, n_jobs=-1
+)
         self.model.fit(X_scaled)
         self.is_trained = True
         print(f"Profile trained for user: {self.username}")
