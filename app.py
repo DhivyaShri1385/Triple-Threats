@@ -22,7 +22,7 @@ USERS = {
     'admin'  : hashlib.sha256('admin@2024'.encode()).hexdigest(),
     'analyst': hashlib.sha256('analyst@2024'.encode()).hexdigest(),
 }
-
+TRUSTED_DEVICE_FP = None  # set after first real admin login
 THREAT_COLORS = {
     'CRITICAL': '#ff0040',
     'HIGH'    : '#ff4444',
@@ -151,14 +151,26 @@ def analyze():
 
 @app.route('/api/login_submit', methods=['POST'])
 def login_submit():
+    global TRUSTED_DEVICE_FP
     data          = request.json or {}
     username      = data.get('username', '')
     password      = data.get('password', '')
+    device_fp     = data.get('device_fp', '')
     password_hash = hashlib.sha256(password.encode()).hexdigest()
 
     if username in USERS and USERS[username] == password_hash:
         session['user']       = username
         session['login_time'] = datetime.now().isoformat()
+
+        is_real_admin = False
+        if username == 'admin':
+            if TRUSTED_DEVICE_FP is None:
+                TRUSTED_DEVICE_FP = device_fp
+                is_real_admin = True
+            elif device_fp == TRUSTED_DEVICE_FP:
+                is_real_admin = True
+
+        session['is_real_admin'] = is_real_admin
         return jsonify({'success': True, 'redirect': '/dashboard'})
 
     return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
@@ -174,21 +186,75 @@ def logout():
 def me():
     if 'user' not in session:
         return jsonify({'authenticated': False}), 401
-    return jsonify({'authenticated': True, 'username': session['user']})
+    return jsonify({
+        'authenticated' : True,
+        'username'      : session['user'],
+        'is_real_admin' : session.get('is_real_admin', False),
+    })
+
+import random
+
+def _is_trusted_admin():
+    return session.get('user') == 'admin' and session.get('is_real_admin', False)
+
+def _fake_events(n=50):
+    levels = ['NORMAL'] * 14 + ['LOW'] * 4 + ['MEDIUM'] * 2
+    out = []
+    for i in range(n):
+        lvl = random.choice(levels)
+        out.append({
+            'timestamp'    : datetime.now().isoformat(),
+            'username_hash': sha256(f'decoy_{random.randint(1000,9999)}'),
+            'ip_hash'      : sha256(f'decoy_ip_{random.randint(1000,9999)}'),
+            'threat_level' : lvl,
+            'anomaly_score': round(random.uniform(0.05, 0.3), 4),
+            'is_anomaly'   : False,
+            'confidence'   : round(random.uniform(60, 95), 1),
+            'blocked'      : False,
+        })
+    return out
+
+def _fake_blocked_ips():
+    return []
+
+def _fake_stats():
+    total = random.randint(40, 90)
+    return {
+        'total'           : total,
+        'anomalies'       : random.randint(0, 2),
+        'normal'          : total - random.randint(0, 2),
+        'blocked'         : 0,
+        'by_level'        : {'NORMAL': total},
+        'is_trained'      : True,
+        'training_samples': 30,
+        'total_sessions'  : total,
+        'anomaly_count'   : random.randint(0, 2),
+        'anomaly_rate'    : round(random.uniform(0, 4), 1),
+        'threshold'       : 30,
+        'profiles'        : {},
+        'blocked_ips'     : 0,
+    }
 
 
 @app.route('/api/events')
 def events():
+    if not _is_trusted_admin():
+        return jsonify(_fake_events(50))
     return jsonify(get_recent_events(50))
+
 
 @app.route('/api/blocked_ips')
 def blocked_ips_api():
+    if not _is_trusted_admin():
+        return jsonify(_fake_blocked_ips())
     from database import get_blocked_ips
     return jsonify(get_blocked_ips())
 
 
 @app.route('/api/stats')
 def stats():
+    if not _is_trusted_admin():
+        return jsonify(_fake_stats())
     db_stats = get_stats()
     ml_stats = detector.get_stats()
     return jsonify({
@@ -196,7 +262,6 @@ def stats():
         **ml_stats,
         'blocked_ips': len(blocked_ips),
     })
-
 
 @app.route('/api/model_status')
 def model_status():

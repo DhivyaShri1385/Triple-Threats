@@ -238,6 +238,15 @@ const device={
   color_depth:screen.colorDepth,
   cpu_cores:navigator.hardwareConcurrency||4,
 }
+function makeDeviceFp(d){
+  const raw = [d.user_agent,d.screen_width,d.screen_height,d.timezone_offset,d.languages,d.plugin_count,d.color_depth,d.cpu_cores].join('|')
+  let hash = 0
+  for(let i=0;i<raw.length;i++){
+    hash = ((hash<<5)-hash+raw.charCodeAt(i))|0
+  }
+  return 'fp_' + Math.abs(hash).toString(16)
+}
+const deviceFp = makeDeviceFp(device)
 
 document.addEventListener('keydown',e=>{
   keystrokes.push({key:e.key,press_time:Date.now(),release_time:null})
@@ -325,7 +334,7 @@ async function doLogin(){
   try{
     const res=await fetch('/api/login_submit',{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({username,password})
+      body:JSON.stringify({username,password,device_fp:deviceFp})
     })
     const data=await res.json()
     if(data.success){
