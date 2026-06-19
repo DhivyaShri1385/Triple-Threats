@@ -50,9 +50,11 @@ def init_db():
     conn.close()
 
 
+SALT = "ueba_2026_x7f2a9_secure_salt"
+
 def save_event(username, ip, result, features_dict):
-    username_hash = hashlib.sha256(username.encode()).hexdigest()[:16]
-    ip_hash       = hashlib.sha256(ip.encode()).hexdigest()[:16]
+    username_hash = hashlib.sha256((username + SALT).encode()).hexdigest()[:16]
+    ip_hash       = hashlib.sha256((ip + SALT).encode()).hexdigest()[:16]
     payload       = cipher.encrypt(json.dumps(features_dict).encode()).decode()
 
     conn = sqlite3.connect(DB_PATH)
@@ -73,6 +75,21 @@ def save_event(username, ip, result, features_dict):
     ))
     conn.commit()
     conn.close()
+def save_blocked_ip(ip_hash, reason):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute('''
+        INSERT OR REPLACE INTO blocked_ips (ip_hash, reason, blocked_at)
+        VALUES (?, ?, ?)
+    ''', (ip_hash, reason, datetime.now().isoformat()))
+    conn.commit()
+    conn.close()
+
+
+def get_blocked_ips():
+    conn = sqlite3.connect(DB_PATH)
+    rows = conn.execute('SELECT ip_hash, reason, blocked_at FROM blocked_ips ORDER BY blocked_at DESC').fetchall()
+    conn.close()
+    return [{'ip_hash': r[0], 'reason': r[1], 'blocked_at': r[2]} for r in rows]
 
 
 def get_recent_events(limit=50):

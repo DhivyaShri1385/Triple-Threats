@@ -8,7 +8,7 @@ from datetime import datetime
 
 from behavior_tracker import build_feature_vector, FEATURE_NAMES
 from ml_engine import detector
-from database import save_event, get_recent_events, get_stats
+from database import save_event, get_recent_events, get_stats, get_blocked_ips
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'realtime-ueba-secret-2024')
@@ -33,8 +33,11 @@ THREAT_COLORS = {
 }
 
 
+SALT = "ueba_2026_x7f2a9_secure_salt"
+
 def sha256(val):
-    return hashlib.sha256(str(val).encode()).hexdigest()[:16]
+    salted = str(val) + SALT
+    return hashlib.sha256(salted.encode()).hexdigest()[:16]
 
 
 def get_ip():
@@ -123,6 +126,8 @@ def analyze():
     if result.get('threat_level') == 'CRITICAL':
         blocked_ips.add(sha256(ip))
         result['auto_blocked'] = True
+        from database import save_blocked_ip
+        save_blocked_ip(sha256(ip), 'CRITICAL anomaly score detected')
 
     ip_key = sha256(ip)
     failed_attempts[ip_key] = failed_attempts.get(ip_key, 0) + (1 if attempt_num > 1 else 0)
@@ -175,6 +180,11 @@ def me():
 @app.route('/api/events')
 def events():
     return jsonify(get_recent_events(50))
+
+@app.route('/api/blocked_ips')
+def blocked_ips_api():
+    from database import get_blocked_ips
+    return jsonify(get_blocked_ips())
 
 
 @app.route('/api/stats')
