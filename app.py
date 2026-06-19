@@ -56,12 +56,14 @@ def index():
 def login_page():
     return render_template('login.html')
 
-
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
         return redirect(url_for('login_page'))
-    return render_template('dashboard.html')
+    if _is_trusted_admin():
+        return render_template('dashboard.html')
+    log_attacker_view(session.get('user', 'unknown'), get_ip())
+    return render_template('fake_dashboard.html')
 
 
 # ── API ───────────────────────────────────────────────────────
@@ -235,6 +237,92 @@ def _fake_stats():
         'blocked_ips'     : 0,
     }
 
+def _fake_team():
+    names = ['Rahul Mehta', 'Sneha Iyer', 'Vikram Rao', 'Anjali Nair', 'Karthik S',
+              'Divya Pillai', 'Arjun Kapoor', 'Meera Sundar']
+    roles = ['Senior Software Engineer', 'Product Manager', 'DevOps Engineer',
+              'UI/UX Designer', 'QA Lead', 'Backend Developer', 'Data Analyst', 'HR Manager']
+    depts = ['Engineering', 'Product', 'Engineering', 'Design', 'Quality', 'Engineering', 'Analytics', 'HR']
+    cities = ['Chennai', 'Bangalore', 'Hyderabad', 'Pune', 'Mumbai', 'Coimbatore', 'Kochi', 'Delhi']
+    out = []
+    for i in range(8):
+        out.append({
+            'name'       : names[i],
+            'role'       : roles[i],
+            'department' : depts[i],
+            'salary'     : random.choice([45000, 62000, 78000, 95000, 110000, 135000]),
+            'address'    : f'{random.randint(10,400)} {random.choice(["MG Road","Anna Salai","Park Street","Brigade Road"])}, {cities[i]}',
+            'email'      : names[i].lower().replace(' ', '.') + '@technova.com',
+            'status'     : random.choice(['Active', 'Active', 'On Leave']),
+            'joined'     : f'20{random.randint(19,24)}-0{random.randint(1,9)}-{random.randint(10,28)}',
+        })
+    return out
+
+def _fake_projects():
+    names = ['Project Phoenix', 'CloudSync v2', 'Mobile Revamp', 'API Gateway',
+              'Customer Portal', 'Analytics Engine']
+    statuses = ['In Progress', 'In Progress', 'Completed', 'Planning', 'In Progress', 'Review']
+    out = []
+    for i, n in enumerate(names):
+        out.append({
+            'name'     : n,
+            'status'   : statuses[i],
+            'progress' : random.randint(20, 95),
+            'budget'   : random.choice([250000, 480000, 620000, 890000, 1200000]),
+            'deadline' : f'2026-0{random.randint(7,9)}-{random.randint(10,28)}',
+            'lead'     : random.choice(['Rahul Mehta', 'Sneha Iyer', 'Vikram Rao', 'Karthik S']),
+        })
+    return out
+
+def _fake_business_stats():
+    return {
+        'revenue'        : random.randint(2800000, 4200000),
+        'revenue_growth' : round(random.uniform(8, 22), 1),
+        'employees'      : 8,
+        'active_projects': random.randint(4, 6),
+        'monthly_trend'  : [random.randint(180000, 420000) for _ in range(7)],
+    }
+def _real_company_data():
+    """Static REAL company data — edit these values with actual info"""
+    return {
+        'team': [
+            {'name': 'Dhivya Shri S', 'role': 'ML Engineer & Team Lead', 'department': 'Engineering',
+             'salary': 0, 'address': 'M.Kumarasamy College of Engineering, Karur',
+             'email': 'dhivyashri@mkce.ac.in', 'status': 'Active', 'joined': '2025-08-01'},
+            {'name': 'Priyanka P', 'role': 'Security Analyst', 'department': 'Security',
+             'salary': 0, 'address': 'M.Kumarasamy College of Engineering, Karur',
+             'email': 'priyanka@mkce.ac.in', 'status': 'Active', 'joined': '2025-08-01'},
+            {'name': 'Aishwaraya V', 'role': 'UI/UX Lead', 'department': 'Design',
+             'salary': 0, 'address': 'M.Kumarasamy College of Engineering, Karur',
+             'email': 'aishwaraya@mkce.ac.in', 'status': 'Active', 'joined': '2025-08-01'},
+        ],
+        'projects': [
+            {'name': 'Real-Time UEBA Platform', 'status': 'In Progress', 'progress': 92,
+             'budget': 0, 'deadline': '2026-06-20', 'lead': 'Dhivya Shri S'},
+            {'name': 'Behavioral Biometric Engine', 'status': 'Completed', 'progress': 100,
+             'budget': 0, 'deadline': '2026-06-15', 'lead': 'Dhivya Shri S'},
+            {'name': 'SOC Dashboard & Honeypot System', 'status': 'In Progress', 'progress': 88,
+             'budget': 0, 'deadline': '2026-06-20', 'lead': 'Priyanka P'},
+        ],
+        'business_stats': {
+            'revenue': 0,
+            'revenue_growth': 0,
+            'employees': 3,
+            'active_projects': 2,
+            'monthly_trend': [0, 0, 0, 0, 0, 0, 0],
+        }
+    }
+
+# Tracks attacker sessions that hit the fake dashboard
+attacker_log = []
+
+def log_attacker_view(username, ip):
+    attacker_log.append({
+        'timestamp'    : datetime.now().isoformat(),
+        'username_hash': sha256(username),
+        'ip_hash'      : sha256(ip),
+        'page'         : 'fake_dashboard',
+    })
 
 @app.route('/api/events')
 def events():
@@ -263,10 +351,33 @@ def stats():
         'blocked_ips': len(blocked_ips),
     })
 
+@app.route('/api/team')
+def team_api():
+    return jsonify(_fake_team())
+
+@app.route('/api/projects')
+def projects_api():
+    return jsonify(_fake_projects())
+
+@app.route('/api/business_stats')
+def business_stats_api():
+    return jsonify(_fake_business_stats())
+
+@app.route('/api/real_company')
+def real_company_api():
+    if not _is_trusted_admin():
+        return jsonify({'error': 'forbidden'}), 403
+    return jsonify(_real_company_data())
+
+@app.route('/api/attacker_log')
+def attacker_log_api():
+    if not _is_trusted_admin():
+        return jsonify({'error': 'forbidden'}), 403
+    return jsonify(list(reversed(attacker_log)))
+
 @app.route('/api/model_status')
 def model_status():
     return jsonify(detector.get_stats())
-
 
 if __name__ == '__main__':
     print("\n" + "="*50)

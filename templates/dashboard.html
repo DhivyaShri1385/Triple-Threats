@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>UEBA Platform — SOC Dashboard</title>
+<title>UEBA Platform — Admin Console</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#0b1120;--navy2:#111827;--navy3:#1a2540;--navy4:#243050;
@@ -17,7 +17,6 @@
 }
 body{background:var(--navy);font-family:var(--font);color:var(--text);min-height:100vh}
 
-/* TOPBAR */
 .topbar{
   background:var(--navy2);border-bottom:1px solid var(--border);
   padding:0 24px;height:64px;display:flex;align-items:center;
@@ -25,126 +24,103 @@ body{background:var(--navy);font-family:var(--font);color:var(--text);min-height
 }
 .brand{display:flex;align-items:center;gap:10px}
 .brand-icon{
-  width:36px;height:36px;
-  background:linear-gradient(135deg,var(--blue),var(--accent));
+  width:36px;height:36px;background:linear-gradient(135deg,var(--blue),var(--accent));
   border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;
 }
 .brand-name{font-size:16px;font-weight:700}
 .brand-sub{font-size:11px;color:var(--muted);margin-top:1px}
-
 .topbar-right{display:flex;align-items:center;gap:16px}
 .live-badge{
-  display:flex;align-items:center;gap:6px;
-  background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);
-  padding:5px 12px;border-radius:20px;font-size:12px;color:var(--success);
+  display:flex;align-items:center;gap:6px;background:rgba(16,185,129,.1);
+  border:1px solid rgba(16,185,129,.3);padding:5px 12px;border-radius:20px;
+  font-size:12px;color:var(--success);
 }
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 .top-clock{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .top-user{
-  display:flex;align-items:center;gap:8px;
-  background:var(--navy3);border:1px solid var(--border);
-  padding:6px 14px;border-radius:8px;font-size:13px;
+  display:flex;align-items:center;gap:8px;background:var(--navy3);
+  border:1px solid var(--border);padding:6px 14px;border-radius:8px;font-size:13px;
 }
 .user-avatar{
-  width:26px;height:26px;border-radius:50%;
-  background:linear-gradient(135deg,var(--blue),var(--accent));
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;
+  width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
 }
 .btn-logout{
-  background:transparent;border:1px solid var(--border);
-  color:var(--muted);padding:7px 14px;border-radius:8px;
-  font-size:13px;font-family:var(--font);cursor:pointer;transition:.2s;
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  padding:7px 14px;border-radius:8px;font-size:13px;font-family:var(--font);cursor:pointer;transition:.2s;
 }
 .btn-logout:hover{border-color:var(--danger);color:var(--danger)}
 .btn-report{
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  border:none;color:#fff;font-family:var(--font);
-  font-size:13px;padding:7px 14px;border-radius:8px;
-  cursor:pointer;transition:.2s;margin-right:8px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);border:none;color:#fff;
+  font-family:var(--font);font-size:13px;padding:7px 14px;border-radius:8px;cursor:pointer;
 }
 .btn-report:hover{opacity:.88}
-/* LAYOUT */
-.main{padding:24px;display:grid;gap:20px}
-.row{display:grid;gap:20px}
+
+.layout{display:flex;min-height:calc(100vh - 64px)}
+.sidebar{width:230px;background:var(--navy2);border-right:1px solid var(--border);padding:20px 14px;flex-shrink:0}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;
+  margin-bottom:4px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:.15s;
+}
+.nav-item:hover{background:var(--navy3)}
+.nav-item.active{background:rgba(37,99,235,.15);color:var(--blue3);font-weight:600}
+.nav-icon{width:18px;text-align:center}
+
+.main{padding:24px;flex:1;max-width:1400px}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+
+.row{display:grid;gap:20px;margin-bottom:20px}
 .row-4{grid-template-columns:repeat(4,1fr)}
 .row-2{grid-template-columns:1fr 1fr}
 .row-32{grid-template-columns:3fr 2fr}
-.row-21{grid-template-columns:2fr 1fr}
+.row-31{grid-template-columns:2.2fr 1fr}
 @media(max-width:1100px){.row-4{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.row-4,.row-2,.row-32,.row-21{grid-template-columns:1fr}}
+@media(max-width:768px){.row-4,.row-2,.row-32,.row-31{grid-template-columns:1fr}}
 
-/* CARDS */
-.card{
-  background:var(--navy2);border:1px solid var(--border);
-  border-radius:12px;padding:20px;
-}
+.card{background:var(--navy2);border:1px solid var(--border);border-radius:12px;padding:20px}
 .card-title{
-  font-size:13px;font-weight:600;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px;
-  display:flex;align-items:center;justify-content:space-between;
+  font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;
 }
 .card-title-left{display:flex;align-items:center;gap:8px}
 .card-dot{width:6px;height:6px;border-radius:50%}
 
-/* STAT CARDS */
-.stat-card{position:relative;overflow:hidden}
-.stat-card::after{
-  content:'';position:absolute;
-  width:120px;height:120px;border-radius:50%;
-  top:-30px;right:-30px;opacity:.06;
-}
-.stat-card.blue::after{background:var(--blue)}
-.stat-card.cyan::after{background:var(--accent)}
-.stat-card.green::after{background:var(--success)}
-.stat-card.red::after{background:var(--danger)}
-.stat-num{font-size:32px;font-weight:700;line-height:1;margin-bottom:6px}
+.stat-num{font-size:26px;font-weight:700;color:var(--blue3)}
 .stat-label{font-size:13px;color:var(--muted)}
-.stat-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
-  margin-top:10px;
-}
+.stat-change{font-size:12px;font-weight:600;color:var(--success);margin-top:6px}
 
-/* FEED */
 .feed-wrap{max-height:380px;overflow-y:auto}
-.feed-wrap::-webkit-scrollbar{width:4px}
-.feed-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 .feed-item{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 14px;border-radius:8px;margin-bottom:8px;
-  background:var(--navy3);border:1px solid var(--border);
-  border-left:3px solid;transition:.2s;
-  animation:fadeIn .3s ease;
+  display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:8px;margin-bottom:8px;
+  background:var(--navy3);border:1px solid var(--border);border-left:3px solid;
 }
-@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-.feed-item:hover{border-color:var(--blue)}
-.feed-ts{font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.feed-ts{font-size:11px;color:var(--muted);white-space:nowrap}
 .feed-hash{font-family:monospace;font-size:12px;color:var(--accent);flex:1}
-.feed-score{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
-.threat-pill{
-  padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;
-  border:1px solid;white-space:nowrap;
-}
+.threat-pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap}
 
-/* GAUGE */
 .gauge-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .gauge-label{width:130px;font-size:12px;color:var(--muted)}
 .gauge-track{flex:1;height:6px;background:var(--navy3);border-radius:3px;overflow:hidden}
 .gauge-fill{height:100%;border-radius:3px;transition:width .4s ease}
 .gauge-val{width:40px;text-align:right;font-size:12px;font-weight:500}
 
-/* MODEL STATUS */
 .model-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.model-item{
-  background:var(--navy3);border:1px solid var(--border);
-  border-radius:8px;padding:14px;text-align:center;
-}
+.model-item{background:var(--navy3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
 .model-val{font-size:20px;font-weight:700;margin-bottom:4px}
 .model-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
 
-canvas{max-height:200px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px;border-bottom:1px solid var(--border);white-space:nowrap}
+.badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-real{background:rgba(16,185,129,.15);color:var(--success)}
+.badge-fake{background:rgba(239,68,68,.15);color:var(--danger)}
+
+canvas{max-height:220px}
+.section{display:none}
+.section.active{display:block}
 </style>
 </head>
 <body>
@@ -153,212 +129,287 @@ canvas{max-height:200px}
   <div class="brand">
     <div class="brand-icon">🛡</div>
     <div>
-      <div class="brand-name">UEBA Platform</div>
-      <div class="brand-sub">Security Operations Center</div>
+      <div class="brand-name">UEBA<span style="color:var(--muted)">-SOC</span> Admin</div>
+      <div class="brand-sub">Trusted Administrator Console</div>
     </div>
   </div>
   <div class="topbar-right">
+    <button class="btn-report" onclick="downloadReport()" id="reportBtn">Download report</button>
     <div class="live-badge"><div class="live-dot"></div>Live</div>
     <div class="top-clock" id="clock">--:--:--</div>
     <div class="top-user">
       <div class="user-avatar" id="userInitial">—</div>
       <span id="topUser">—</span>
     </div>
-    <button class="btn-report" onclick="downloadReport()" id="reportBtn">Download report</button>
-<button class="btn-logout" onclick="doLogout()">Sign out</button>
+    <button class="btn-logout" onclick="doLogout()">Sign out</button>
   </div>
 </div>
 
-<div class="main">
-
-  <!-- STAT CARDS -->
-  <div class="row row-4">
-    <div class="card stat-card blue">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue)"></div>Total sessions</div></div>
-      <div class="stat-num" id="s-total" style="color:var(--blue3)">—</div>
-      <div class="stat-label">Login attempts analyzed</div>
-      <div class="stat-badge" style="background:rgba(37,99,235,.1);color:var(--blue3);border:1px solid rgba(37,99,235,.2)">All time</div>
-    </div>
-    <div class="card stat-card red">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Anomalies</div></div>
-      <div class="stat-num" id="s-anomalies" style="color:var(--danger)">—</div>
-      <div class="stat-label">Suspicious sessions flagged</div>
-      <div class="stat-badge" id="anomaly-rate" style="background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.2)">—% rate</div>
-    </div>
-    <div class="card stat-card cyan" onclick="toggleBlockedPanel()" style="cursor:pointer">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Blocked IPs</div></div>
-      <div class="stat-num" id="s-blocked" style="color:var(--accent)">—</div>
-      <div class="stat-label">Click to view details</div>
-      <div class="stat-badge" style="background:rgba(6,182,212,.1);color:var(--accent);border:1px solid rgba(6,182,212,.2)">Active blocks</div>
-    </div>
-    <div class="card stat-card green">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Model status</div></div>
-      <div class="stat-num" id="s-model" style="color:var(--success)">—</div>
-      <div class="stat-label" id="s-model-label">Initializing</div>
-      <div class="stat-badge" id="s-model-badge" style="background:rgba(16,185,129,.1);color:var(--success);border:1px solid rgba(16,185,129,.2)">Isolation Forest</div>
-    </div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-item active" data-section="technova"><span class="nav-icon">🏢</span> TechNova Solutions</div>
+    <div class="nav-item" data-section="attacker"><span class="nav-icon">🎯</span> Attacker Activity</div>
+    <div class="nav-item" data-section="security"><span class="nav-icon">🔒</span> Security Operations</div>
   </div>
 
-  <!-- FEED + METRICS -->
-  <div class="row row-32">
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Live session feed</div>
-        <span style="font-size:11px;color:var(--muted)">Auto-refreshes every 3s</span>
+  <div class="main">
+
+    <!-- ═══ TAB 1: REAL COMPANY DATA ═══ -->
+    <div class="section active" id="sec-technova">
+      <div class="page-title">TechNova Solutions — Real Data</div>
+      <div class="page-sub">Genuine company records — only visible to verified admin</div>
+
+      <div class="row row-4">
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Revenue</div></div>
+          <div class="stat-num" id="rc-revenue">—</div>
+          <div class="stat-label">Annual revenue</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Team</div></div>
+          <div class="stat-num" id="rc-employees">—</div>
+          <div class="stat-label">Real employees</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Projects</div></div>
+          <div class="stat-num" id="rc-projects">—</div>
+          <div class="stat-label">Active projects</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--warning)"></div>Status</div></div>
+          <div class="stat-num" style="color:var(--success)">Verified</div>
+          <div class="stat-label">Data source: real</div>
+        </div>
       </div>
-      <div class="feed-wrap" id="feed"></div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Real team members</div></div>
+        <table>
+          <tr><th>Name</th><th>Role</th><th>Department</th><th>Email</th><th>Status</th></tr>
+          <tbody id="rc-team"></tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Real projects</div></div>
+        <table>
+          <tr><th>Project</th><th>Lead</th><th>Status</th><th>Progress</th><th>Deadline</th></tr>
+          <tbody id="rc-proj"></tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Behavioral signals</div></div>
-      <div class="gauge-row">
-        <span class="gauge-label">Keystroke rhythm</span>
-        <div class="gauge-track"><div class="gauge-fill" id="g-rhythm" style="background:var(--blue3)"></div></div>
-        <span class="gauge-val" id="gv-rhythm" style="color:var(--blue3)">—</span>
-      </div>
-      <div class="gauge-row">
-        <span class="gauge-label">Typing speed</span>
-        <div class="gauge-track"><div class="gauge-fill" id="g-speed" style="background:var(--accent)"></div></div>
-        <span class="gauge-val" id="gv-speed" style="color:var(--accent)">—</span>
-      </div>
-      <div class="gauge-row">
-        <span class="gauge-label">Mouse velocity</span>
-        <div class="gauge-track"><div class="gauge-fill" id="g-mouse" style="background:var(--blue3)"></div></div>
-        <span class="gauge-val" id="gv-mouse" style="color:var(--blue3)">—</span>
-      </div>
-      <div class="gauge-row">
-        <span class="gauge-label">Hesitations</span>
-        <div class="gauge-track"><div class="gauge-fill" id="g-hesit" style="background:var(--warning)"></div></div>
-        <span class="gauge-val" id="gv-hesit" style="color:var(--warning)">—</span>
-      </div>
-      <div class="gauge-row">
-        <span class="gauge-label">Bot signals</span>
-        <div class="gauge-track"><div class="gauge-fill" id="g-bot" style="background:var(--danger)"></div></div>
-        <span class="gauge-val" id="gv-bot" style="color:var(--danger)">—</span>
-      </div>
-      <div style="margin-top:20px">
-        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Threat distribution</div></div>
-        <canvas id="threatChart"></canvas>
-      </div>
-    </div>
-  </div>
+    <!-- ═══ TAB 2: ATTACKER ACTIVITY ═══ -->
+    <div class="section" id="sec-attacker">
+      <div class="page-title">Attacker Activity</div>
+      <div class="page-sub">Who tried to access the system and what fake data they were shown</div>
 
-  <!-- CHARTS -->
-  <div class="row row-2">
-    <div class="card">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Anomaly score timeline</div></div>
-      <canvas id="scoreChart"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--warning)"></div>Threat level breakdown</div></div>
-      <canvas id="levelChart"></canvas>
-    </div>
-  </div>
+      <div class="row row-4">
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Decoy views</div></div>
+          <div class="stat-num" id="atk-total" style="color:var(--danger)">—</div>
+          <div class="stat-label">Times fake dashboard shown</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--warning)"></div>Unique sessions</div></div>
+          <div class="stat-num" id="atk-unique" style="color:var(--warning)">—</div>
+          <div class="stat-label">Distinct attacker hashes</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Deception status</div></div>
+          <div class="stat-num" style="color:var(--success)">Active</div>
+          <div class="stat-label">Real data never exposed</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Last attempt</div></div>
+          <div class="stat-num" id="atk-last" style="font-size:14px">—</div>
+          <div class="stat-label">Most recent decoy view</div>
+        </div>
+      </div>
 
-  <!-- MODEL INFO -->
-  <div class="card">
-    <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>ML engine — Isolation Forest</div></div>
-    <div class="model-grid">
-      <div class="model-item">
-        <div class="model-val" id="m-trained" style="color:var(--success)">—</div>
-        <div class="model-label">Trained</div>
-      </div>
-      <div class="model-item">
-        <div class="model-val" id="m-samples" style="color:var(--blue3)">—</div>
-        <div class="model-label">Training samples</div>
-      </div>
-      <div class="model-item">
-        <div class="model-val" style="color:var(--muted)">30</div>
-        <div class="model-label">Threshold</div>
-      </div>
-      <div class="model-item">
-        <div class="model-val" id="m-rate" style="color:var(--danger)">—</div>
-        <div class="model-label">Anomaly rate</div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Sessions shown the fake dashboard</div></div>
+        <table>
+          <tr><th>Time</th><th>Session hash</th><th>IP hash</th><th>Page served</th></tr>
+          <tbody id="atk-table"></tbody>
+        </table>
       </div>
     </div>
-  </div>
-  <div class="card" id="blockedPanel" style="display:none">
-    <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Blocked IP addresses</div></div>
-    <div id="blockedList" style="font-size:13px"></div>
+
+    <!-- ═══ TAB 3: SECURITY OPERATIONS (existing SOC dashboard) ═══ -->
+    <div class="section" id="sec-security">
+      <div class="page-title">Security Operations</div>
+      <div class="page-sub">Real-time behavioral anomaly detection</div>
+
+      <div class="row row-4">
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Total sessions</div></div>
+          <div class="stat-num" id="s-total">—</div>
+          <div class="stat-label">Login attempts analyzed</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Anomalies</div></div>
+          <div class="stat-num" id="s-anomalies" style="color:var(--danger)">—</div>
+          <div class="stat-label">Suspicious sessions flagged</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Blocked IPs</div></div>
+          <div class="stat-num" id="s-blocked" style="color:var(--accent)">—</div>
+          <div class="stat-label">Click to view details</div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Model status</div></div>
+          <div class="stat-num" id="s-model" style="color:var(--success)">—</div>
+          <div class="stat-label" id="s-model-label">Initializing</div>
+        </div>
+      </div>
+
+      <div class="row row-32">
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>Live session feed</div></div>
+          <div class="feed-wrap" id="feed"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Behavioral signals</div></div>
+          <div class="gauge-row">
+            <span class="gauge-label">Keystroke rhythm</span>
+            <div class="gauge-track"><div class="gauge-fill" id="g-rhythm" style="background:var(--blue3)"></div></div>
+            <span class="gauge-val" id="gv-rhythm">—</span>
+          </div>
+          <div class="gauge-row">
+            <span class="gauge-label">Hesitations</span>
+            <div class="gauge-track"><div class="gauge-fill" id="g-hesit" style="background:var(--warning)"></div></div>
+            <span class="gauge-val" id="gv-hesit">—</span>
+          </div>
+          <div class="gauge-row">
+            <span class="gauge-label">Bot signals</span>
+            <div class="gauge-track"><div class="gauge-fill" id="g-bot" style="background:var(--danger)"></div></div>
+            <span class="gauge-val" id="gv-bot">—</span>
+          </div>
+          <div style="margin-top:16px">
+            <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--success)"></div>Threat distribution</div></div>
+            <canvas id="threatChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row-2">
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--blue3)"></div>Anomaly score timeline</div></div>
+          <canvas id="scoreChart"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--warning)"></div>Threat level breakdown</div></div>
+          <canvas id="levelChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card" id="blockedPanel" style="display:none;margin-bottom:20px">
+        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--danger)"></div>Blocked IP addresses</div></div>
+        <div id="blockedList" style="font-size:13px"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="card-title-left"><div class="card-dot" style="background:var(--accent)"></div>ML engine — Isolation Forest</div></div>
+        <div class="model-grid">
+          <div class="model-item">
+            <div class="model-val" id="m-trained" style="color:var(--success)">—</div>
+            <div class="model-label">Trained</div>
+          </div>
+          <div class="model-item">
+            <div class="model-val" id="m-samples" style="color:var(--blue3)">—</div>
+            <div class="model-label">Training samples</div>
+          </div>
+          <div class="model-item">
+            <div class="model-val" style="color:var(--muted)">30</div>
+            <div class="model-label">Threshold</div>
+          </div>
+          <div class="model-item">
+            <div class="model-val" id="m-rate" style="color:var(--danger)">—</div>
+            <div class="model-label">Anomaly rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
+// ── Tab switching ─────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'))
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    item.classList.add('active')
+    document.getElementById('sec-' + item.dataset.section).classList.add('active')
+  })
+})
+
 setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString()},1000)
 
-const COLORS={
-  CRITICAL:'#ef4444',HIGH:'#f97316',
-  MEDIUM:'#f59e0b',LOW:'#10b981',
-  NORMAL:'#10b981',LEARNING:'#06b6d4'
-}
-const BG={
-  CRITICAL:'rgba(239,68,68,.1)',HIGH:'rgba(249,115,22,.1)',
-  MEDIUM:'rgba(245,158,11,.1)',LOW:'rgba(16,185,129,.1)',
-  NORMAL:'rgba(16,185,129,.1)',LEARNING:'rgba(6,182,212,.1)'
+// ── Tab 1: Real TechNova data ─────────────────────────
+async function loadRealCompany(){
+  const r = await fetch('/api/real_company')
+  const d = await r.json()
+  document.getElementById('rc-revenue').textContent = '₹' + (d.business_stats.revenue/100000).toFixed(1) + 'L'
+  document.getElementById('rc-employees').textContent = d.business_stats.employees
+  document.getElementById('rc-projects').textContent = d.business_stats.active_projects
+
+  document.getElementById('rc-team').innerHTML = d.team.map(m => `
+    <tr>
+      <td>${m.name}</td><td>${m.role}</td><td>${m.department}</td>
+      <td style="font-size:12px;color:var(--muted)">${m.email}</td>
+      <td><span class="badge badge-real">${m.status}</span></td>
+    </tr>
+  `).join('')
+
+  document.getElementById('rc-proj').innerHTML = d.projects.map(p => `
+    <tr>
+      <td>${p.name}</td><td>${p.lead}</td><td>${p.status}</td>
+      <td>${p.progress}%</td><td>${p.deadline}</td>
+    </tr>
+  `).join('')
 }
 
+// ── Tab 2: Attacker activity ──────────────────────────
+async function loadAttackerLog(){
+  const r = await fetch('/api/attacker_log')
+  const data = await r.json()
+  document.getElementById('atk-total').textContent = data.length
+  document.getElementById('atk-unique').textContent = new Set(data.map(a=>a.username_hash)).size
+  document.getElementById('atk-last').textContent = data.length ? data[0].timestamp.slice(0,19) : 'None yet'
+
+  document.getElementById('atk-table').innerHTML = data.slice(0,30).map(a => `
+    <tr>
+      <td>${a.timestamp.slice(0,19)}</td>
+      <td style="font-family:monospace;color:var(--accent)">${a.username_hash}</td>
+      <td style="font-family:monospace;color:var(--warning)">${a.ip_hash}</td>
+      <td><span class="badge badge-fake">Fake dashboard</span></td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="color:var(--muted)">No attacker sessions yet</td></tr>'
+}
+
+// ── Tab 3: Security operations (existing logic) ───────
+const COLORS={CRITICAL:'#ff0040',HIGH:'#ff4444',MEDIUM:'#ff9900',LOW:'#ffff00',NORMAL:'#00ff41',LEARNING:'#00d4ff'}
 let scoreChart,levelChart,threatChart
 let scoreLabels=[],scoreData=[]
 
 function initCharts(){
-  const gridColor='rgba(30,58,95,.5)'
-  const tickColor='#475569'
-
   scoreChart=new Chart(document.getElementById('scoreChart'),{
     type:'line',
-    data:{
-      labels:scoreLabels,
-      datasets:[{
-        label:'Anomaly Score',data:scoreData,
-        borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',
-        borderWidth:2,pointRadius:3,pointBackgroundColor:'#3b82f6',
-        fill:true,tension:.4,
-      }]
-    },
-    options:{
-      scales:{
-        x:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:11}}},
-        y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:11}},min:-0.5,max:0.2},
-      },
-      plugins:{legend:{display:false}},animation:{duration:400},
-    }
+    data:{labels:scoreLabels,datasets:[{label:'Anomaly Score',data:scoreData,borderColor:'#00ff41',backgroundColor:'#00ff4110',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#00ff41',fill:true,tension:.3}]},
+    options:{scales:{x:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{size:10}}},y:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{size:10}},min:-0.5,max:0.2}},plugins:{legend:{display:false}}}
   })
-
   levelChart=new Chart(document.getElementById('levelChart'),{
     type:'bar',
-    data:{
-      labels:['Normal','Low','Medium','High','Critical'],
-      datasets:[{
-        data:[0,0,0,0,0],
-        backgroundColor:['rgba(16,185,129,.2)','rgba(245,158,11,.2)','rgba(249,115,22,.2)','rgba(239,68,68,.2)','rgba(220,38,38,.2)'],
-        borderColor:['#10b981','#f59e0b','#f97316','#ef4444','#dc2626'],
-        borderWidth:1.5,borderRadius:4,
-      }]
-    },
-    options:{
-      scales:{
-        x:{grid:{display:false},ticks:{color:tickColor,font:{size:11}}},
-        y:{grid:{color:gridColor},ticks:{color:tickColor,font:{size:11}}},
-      },
-      plugins:{legend:{display:false}},
-    }
+    data:{labels:['NORMAL','LOW','MEDIUM','HIGH','CRITICAL'],datasets:[{data:[0,0,0,0,0],backgroundColor:['#00ff4140','#ffff0040','#ff990040','#ff444440','#ff004040'],borderColor:['#00ff41','#ffff00','#ff9900','#ff4444','#ff0040'],borderWidth:1,borderRadius:2}]},
+    options:{scales:{x:{grid:{display:false},ticks:{color:'#008f11',font:{size:10}}},y:{grid:{color:'#00ff4110'},ticks:{color:'#008f11',font:{size:10}}}},plugins:{legend:{display:false}}}
   })
-
   threatChart=new Chart(document.getElementById('threatChart'),{
     type:'doughnut',
-    data:{
-      labels:['Normal','Anomalies'],
-      datasets:[{
-        data:[1,0],
-        backgroundColor:['rgba(16,185,129,.2)','rgba(239,68,68,.2)'],
-        borderColor:['#10b981','#ef4444'],
-        borderWidth:1.5,
-      }]
-    },
-    options:{
-      cutout:'72%',
-      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11},padding:16}}},
-    }
+    data:{labels:['Normal','Anomalies'],datasets:[{data:[1,0],backgroundColor:['#00ff4130','#ff004040'],borderColor:['#00ff41','#ff0040'],borderWidth:1}]},
+    options:{cutout:'70%',plugins:{legend:{labels:{color:'#008f11',font:{size:10}}}}}
   })
 }
 
@@ -369,57 +420,36 @@ async function loadEvents(){
   feed.innerHTML=''
   const levelCounts={NORMAL:0,LOW:0,MEDIUM:0,HIGH:0,CRITICAL:0}
   let normalCount=0,anomalyCount=0
-
   data.forEach(e=>{
-    const col=COLORS[e.threat_level]||'#10b981'
-    const bg=BG[e.threat_level]||'rgba(16,185,129,.1)'
+    const col=COLORS[e.threat_level]||'#00ff41'
     const div=document.createElement('div')
     div.className='feed-item'
     div.style.borderLeftColor=col
-    div.innerHTML=`
-      <span class="feed-ts">${e.timestamp?.slice(11,19)||'—'}</span>
-      <span class="feed-hash">${e.username_hash}</span>
-      <span class="threat-pill" style="color:${col};border-color:${col}40;background:${bg}">${e.threat_level}</span>
-      <span class="feed-score" style="color:${col}">${e.anomaly_score?.toFixed(3)||'—'}</span>
-      ${e.is_anomaly?`<span style="color:var(--danger);font-size:11px">⚠ Anomaly</span>`:''}
-    `
+    div.innerHTML=`<span class="feed-ts">${e.timestamp?.slice(11,19)||'--:--:--'}</span><span class="feed-hash">${e.username_hash}</span><span class="threat-pill" style="color:${col};border-color:${col}40;background:${col}10">${e.threat_level}</span><span style="color:${col};font-weight:700">${e.anomaly_score?.toFixed(3)||'?'}</span>${e.is_anomaly?'<span style="color:#ff0040;font-size:10px">⚠ ANOMALY</span>':''}`
     feed.appendChild(div)
     if(levelCounts[e.threat_level]!==undefined)levelCounts[e.threat_level]++
     if(e.is_anomaly)anomalyCount++;else normalCount++
-    if(e.anomaly_score!==null&&scoreData.length<20){
-      scoreData.push(e.anomaly_score)
-      scoreLabels.push(e.timestamp?.slice(11,19)||'')
-    }
+    if(e.anomaly_score!==null&&scoreData.length<20){scoreData.push(e.anomaly_score);scoreLabels.push(e.timestamp?.slice(11,19)||'')}
   })
-
   if(levelChart){levelChart.data.datasets[0].data=Object.values(levelCounts);levelChart.update()}
   if(threatChart){threatChart.data.datasets[0].data=[normalCount,anomalyCount];threatChart.update()}
-  if(scoreChart){
-    scoreChart.data.labels=scoreLabels.slice(-20)
-    scoreChart.data.datasets[0].data=scoreData.slice(-20)
-    scoreChart.update()
-  }
+  if(scoreChart){scoreChart.data.labels=scoreLabels.slice(-20);scoreChart.data.datasets[0].data=scoreData.slice(-20);scoreChart.update()}
 }
 
 async function loadStats(){
   const r=await fetch('/api/stats')
-  const d=await r.json()
-  document.getElementById('s-total').textContent=d.total||0
-  document.getElementById('s-anomalies').textContent=d.anomalies||0
-  document.getElementById('s-blocked').textContent=d.blocked_ips||0
-  const rate=d.total?Math.round(d.anomalies/d.total*100):0
-  document.getElementById('anomaly-rate').textContent=rate+'% rate'
-
-  const trained=d.is_trained
-  const mEl=document.getElementById('s-model')
-  const mLabel=document.getElementById('s-model-label')
-  mEl.textContent=trained?'Active':'Learning'
-  mEl.style.color=trained?'#10b981':'#06b6d4'
-  mLabel.textContent=trained?'Anomaly detection on':`${d.training_samples||0} / 30 sessions collected`
-  document.getElementById('m-trained').textContent=trained?'Yes':'No'
-  document.getElementById('m-trained').style.color=trained?'#10b981':'#f59e0b'
-  document.getElementById('m-samples').textContent=d.training_samples||0
-  document.getElementById('m-rate').textContent=(d.anomaly_rate||0)+'%'
+  const data=await r.json()
+  document.getElementById('s-total').textContent=data.total||0
+  document.getElementById('s-anomalies').textContent=data.anomalies||0
+  document.getElementById('s-blocked').textContent=data.blocked_ips||0
+  const trained=data.is_trained
+  document.getElementById('s-model').textContent=trained?'ACTIVE':'LEARNING'
+  document.getElementById('s-model').style.color=trained?'#00ff41':'#00d4ff'
+  document.getElementById('s-model-label').textContent=trained?'Anomaly detection on':`${data.training_samples||0}/${data.threshold||30} samples`
+  document.getElementById('m-trained').textContent=trained?'YES':'NO'
+  document.getElementById('m-trained').style.color=trained?'#00ff41':'#ff9900'
+  document.getElementById('m-samples').textContent=data.training_samples||0
+  document.getElementById('m-rate').textContent=(data.anomaly_rate||0)+'%'
 }
 
 async function updateGauges(){
@@ -428,38 +458,18 @@ async function updateGauges(){
   if(!data.length)return
   const latest=data[0]
   const score=latest.anomaly_score||0
-  const rhythm=Math.max(0,(score+0.5)*100)
-  setG('g-rhythm','gv-rhythm',rhythm,rhythm.toFixed(0)+'%')
-  const hesit=latest.is_anomaly?65:10
-  setG('g-hesit','gv-hesit',hesit,latest.is_anomaly?'High':'Low')
-  const bot=latest.threat_level==='CRITICAL'?75:5
+  setG('g-rhythm','gv-rhythm',Math.max(0,(score+0.5)*100))
+  const hesit=latest.is_anomaly?60:10
+  setG('g-hesit','gv-hesit',hesit,latest.is_anomaly?'HIGH':'LOW')
+  const bot=latest.threat_level==='CRITICAL'?80:5
   setG('g-bot','gv-bot',bot,bot+'%')
-  setG('g-speed','gv-speed',55,'—')
-  setG('g-mouse','gv-mouse',45,'—')
 }
-
 function setG(barId,valId,pct,label){
-  const b=document.getElementById(barId)
-  const v=document.getElementById(valId)
+  const b=document.getElementById(barId),v=document.getElementById(valId)
   if(b)b.style.width=Math.min(pct,100)+'%'
-  if(v)v.textContent=label
+  if(v)v.textContent=label||Math.round(pct)+'%'
 }
 
-async function loadMe(){
-  try{
-    const r=await fetch('/api/me')
-    if(r.status===401){window.location.href='/login';return}
-    const d=await r.json()
-    const name=d.username||'—'
-    document.getElementById('topUser').textContent=name
-    document.getElementById('userInitial').textContent=name.charAt(0).toUpperCase()
-  }catch(e){}
-}
-
-async function doLogout(){
-  await fetch('/api/logout',{method:'POST'})
-  window.location.href='/login'
-}
 let blockedPanelOpen = false
 async function toggleBlockedPanel(){
   blockedPanelOpen = !blockedPanelOpen
@@ -467,154 +477,80 @@ async function toggleBlockedPanel(){
   panel.style.display = blockedPanelOpen ? 'block' : 'none'
   if(blockedPanelOpen) await loadBlockedIPs()
 }
+document.querySelector('[id="s-blocked"]').closest('.card').style.cursor='pointer'
+document.querySelector('[id="s-blocked"]').closest('.card').addEventListener('click', toggleBlockedPanel)
 
 async function loadBlockedIPs(){
   const r = await fetch('/api/blocked_ips')
   const data = await r.json()
   const list = document.getElementById('blockedList')
-  if(!data.length){
-    list.innerHTML = '<div style="color:var(--muted);padding:12px">No IPs blocked yet</div>'
-    return
-  }
+  if(!data.length){list.innerHTML = '<div style="color:var(--muted);padding:12px">No IPs blocked yet</div>';return}
   list.innerHTML = data.map(b => `
     <div style="display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--border)">
       <span style="font-family:monospace;color:var(--accent)">${b.ip_hash}</span>
       <span style="color:var(--danger);font-size:12px">${b.reason}</span>
       <span style="margin-left:auto;color:var(--muted);font-size:11px">${b.blocked_at?.slice(0,19)||''}</span>
-    </div>
-  `).join('')
+    </div>`).join('')
 }
+
+// ── Report download ────────────────────────────────────
 async function downloadReport(){
   const btn = document.getElementById('reportBtn')
   btn.textContent = 'Generating...'
   btn.disabled = true
-
-  const r1 = await fetch('/api/stats')
-  const stats = await r1.json()
-  const r2 = await fetch('/api/events')
-  const events = await r2.json()
-
+  const r1 = await fetch('/api/stats'); const stats = await r1.json()
+  const r2 = await fetch('/api/events'); const events = await r2.json()
   const now = new Date().toLocaleString()
   const user = document.getElementById('topUser').textContent
-
-  // Only admin can download
-  if(user !== 'admin'){
-    alert('Access denied. Only admin can download reports.')
-    btn.textContent = 'Download report'
-    btn.disabled = false
-    return
-  }
-
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<title>UEBA Security Report</title>
-<style>
-body{font-family:Arial,sans-serif;background:#f8fafc;color:#1e293b;margin:0;padding:32px}
-.header{background:#0b1120;color:#f1f5f9;padding:32px;border-radius:12px;margin-bottom:24px}
-.header h1{margin:0;font-size:24px;color:#fff}
-.header p{margin:8px 0 0;color:#94a3b8;font-size:14px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;text-align:center}
-.stat-num{font-size:28px;font-weight:700;margin-bottom:4px}
-.stat-label{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:1px}
-.section{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin-bottom:24px}
-.section h2{font-size:16px;font-weight:600;margin:0 0 16px;color:#1e293b}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{background:#f1f5f9;padding:10px 12px;text-align:left;font-weight:600;color:#475569}
-td{padding:10px 12px;border-bottom:1px solid #f1f5f9;color:#334155}
-.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.CRITICAL{background:#fee2e2;color:#dc2626}
-.HIGH{background:#fed7aa;color:#c2410c}
-.MEDIUM{background:#fef3c7;color:#b45309}
-.LOW{background:#d1fae5;color:#065f46}
-.NORMAL{background:#dcfce7;color:#166534}
-.LEARNING{background:#dbeafe;color:#1d4ed8}
-.footer{text-align:center;font-size:12px;color:#94a3b8;margin-top:24px}
-</style>
-</head>
-<body>
-<div class="header">
-  <h1>🛡 UEBA Security Report</h1>
-  <p>Generated: ${now} &nbsp;|&nbsp; Generated by: ${user} &nbsp;|&nbsp; Platform: Real-Time Behavioral Analysis</p>
-</div>
-
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num" style="color:#2563eb">${stats.total||0}</div>
-    <div class="stat-label">Total sessions</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:#ef4444">${stats.anomalies||0}</div>
-    <div class="stat-label">Anomalies detected</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:#10b981">${stats.normal||0}</div>
-    <div class="stat-label">Normal sessions</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num" style="color:#f59e0b">${stats.anomaly_rate||0}%</div>
-    <div class="stat-label">Anomaly rate</div>
-  </div>
-</div>
-
-<div class="section">
-  <h2>ML Model Status</h2>
-  <table>
-    <tr><th>Parameter</th><th>Value</th></tr>
-    <tr><td>Model type</td><td>Isolation Forest</td></tr>
-    <tr><td>Training status</td><td>${stats.is_trained ? 'Trained and active' : 'Learning'}</td></tr>
-    <tr><td>Training samples</td><td>${stats.training_samples||0}</td></tr>
-    <tr><td>Training threshold</td><td>${stats.threshold||30} sessions</td></tr>
-    <tr><td>Total anomalies detected</td><td>${stats.anomaly_count||0}</td></tr>
-    <tr><td>Blocked IPs</td><td>${stats.blocked_ips||0}</td></tr>
-  </table>
-</div>
-
-<div class="section">
-  <h2>Recent Session Events (last 50)</h2>
-  <table>
-    <tr>
-      <th>Timestamp</th>
-      <th>Session ID</th>
-      <th>Threat level</th>
-      <th>Anomaly score</th>
-      <th>Anomaly</th>
-    </tr>
-    ${events.map(e=>`
-    <tr>
-      <td>${e.timestamp?.slice(0,19)||'—'}</td>
-      <td style="font-family:monospace;font-size:11px">${e.username_hash}</td>
-      <td><span class="badge ${e.threat_level}">${e.threat_level}</span></td>
-      <td>${e.anomaly_score?.toFixed(4)||'—'}</td>
-      <td>${e.is_anomaly ? '⚠ Yes' : 'No'}</td>
-    </tr>`).join('')}
-  </table>
-</div>
-
-<div class="footer">
-  UEBA Platform &nbsp;|&nbsp; SHA-256 pseudonymized &nbsp;|&nbsp; AES-256 encrypted &nbsp;|&nbsp; GDPR compliant
-</div>
-</body>
-</html>`
-
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>UEBA Security Report</title>
+  <style>body{font-family:Arial,sans-serif;background:#f8fafc;color:#1e293b;margin:0;padding:32px}
+  .header{background:#0b1120;color:#f1f5f9;padding:32px;border-radius:12px;margin-bottom:24px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .stat{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;text-align:center}
+  .stat-num{font-size:28px;font-weight:700}.section{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:20px;margin-bottom:24px}
+  table{width:100%;border-collapse:collapse;font-size:13px}th{background:#f1f5f9;padding:10px 12px;text-align:left}
+  td{padding:10px 12px;border-bottom:1px solid #f1f5f9}.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .CRITICAL{background:#fee2e2;color:#dc2626}.HIGH{background:#fed7aa;color:#c2410c}.MEDIUM{background:#fef3c7;color:#b45309}
+  .LOW{background:#d1fae5;color:#065f46}.NORMAL{background:#dcfce7;color:#166534}.LEARNING{background:#dbeafe;color:#1d4ed8}</style></head>
+  <body><div class="header"><h1>🛡 UEBA Security Report</h1><p>Generated: ${now} | By: ${user}</p></div>
+  <div class="stats"><div class="stat"><div class="stat-num" style="color:#2563eb">${stats.total||0}</div>Total sessions</div>
+  <div class="stat"><div class="stat-num" style="color:#ef4444">${stats.anomalies||0}</div>Anomalies</div>
+  <div class="stat"><div class="stat-num" style="color:#10b981">${stats.normal||0}</div>Normal</div>
+  <div class="stat"><div class="stat-num" style="color:#f59e0b">${stats.anomaly_rate||0}%</div>Rate</div></div>
+  <div class="section"><h2>Recent Events</h2><table><tr><th>Time</th><th>Session</th><th>Threat</th><th>Score</th></tr>
+  ${events.map(e=>`<tr><td>${e.timestamp?.slice(0,19)||'—'}</td><td style="font-family:monospace">${e.username_hash}</td>
+  <td><span class="badge ${e.threat_level}">${e.threat_level}</span></td><td>${e.anomaly_score?.toFixed(4)||'—'}</td></tr>`).join('')}
+  </table></div></body></html>`
   const blob = new Blob([html], {type:'text/html'})
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href     = url
-  a.download = `UEBA_Report_${new Date().toISOString().slice(0,10)}.html`
-  a.click()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url; a.download = `UEBA_Report_${new Date().toISOString().slice(0,10)}.html`; a.click()
   URL.revokeObjectURL(url)
-
-  btn.textContent = 'Download report'
-  btn.disabled    = false
+  btn.textContent = 'Download report'; btn.disabled = false
 }
+
+async function loadMe(){
+  try{
+    const r = await fetch('/api/me')
+    if(r.status===401){window.location.href='/login';return}
+    const d = await r.json()
+    document.getElementById('topUser').textContent = d.username||'—'
+    document.getElementById('userInitial').textContent = (d.username||'A').charAt(0).toUpperCase()
+  }catch(e){}
+}
+
+async function doLogout(){
+  await fetch('/api/logout',{method:'POST'})
+  window.location.href='/login'
+}
+
 initCharts()
 loadMe()
+loadRealCompany()
+loadAttackerLog()
 loadStats()
 loadEvents()
-setInterval(()=>{loadStats();loadEvents();updateGauges()},3000)
+setInterval(()=>{loadStats();loadEvents();updateGauges();loadAttackerLog()},3000)
 </script>
 </body>
 </html>
