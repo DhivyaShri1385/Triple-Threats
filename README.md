@@ -282,9 +282,13 @@ MIT License — free to use for educational purposes.
 1)Login
 <img width="1848" height="872" alt="image" src="https://github.com/user-attachments/assets/12adac3c-1e35-4b10-b91a-85d15fe5a95c" />
 2)TechNova Solutions 
-<img width="1847" height="871" alt="image" src="https://github.com/user-attachments/assets/5fe1fa45-7a98-427b-b56a-37e3dcbfff35" />
+<img width="1845" height="875" alt="image" src="https://github.com/user-attachments/assets/12cd30e8-6efd-490d-8a76-709db8e9723e" />
 3)Attacker Activity
-<img width="1842" height="878" alt="image" src="https://github.com/user-attachments/assets/c8fdecd8-d1f5-430a-a565-962aafef5d59" />
+<img width="1850" height="871" alt="image" src="https://github.com/user-attachments/assets/27003c7d-630f-412b-aabc-570107f73a6b" />
+4)Security Operations
+<img width="1847" height="1076" alt="image" src="https://github.com/user-attachments/assets/12fca962-368b-4b5c-9bdb-cc18983815ea" />
+<img width="1842" height="458" alt="image" src="https://github.com/user-attachments/assets/917a1da5-6361-496a-b21d-558d25dd0259" />
+
 
 
 
