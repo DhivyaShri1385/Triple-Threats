@@ -276,3 +276,29 @@ ueba_project/
 ## 📄 License
 
 MIT License — free to use for educational purposes.
+
+## Outcome
+## Real-Admin Dashboard
+1)Login
+<img width="1848" height="872" alt="image" src="https://github.com/user-attachments/assets/12adac3c-1e35-4b10-b91a-85d15fe5a95c" />
+2)TechNova Solutions 
+<img width="1847" height="871" alt="image" src="https://github.com/user-attachments/assets/5fe1fa45-7a98-427b-b56a-37e3dcbfff35" />
+3)Attacker Activity
+<img width="1843" height="881" alt="image" src="https://github.com/user-attachments/assets/8dfc12fb-b66f-4205-9d5f-645249aeb0c8" />
+
+
+## Fake Dashboard
+1)Login
+<img width="1848" height="872" alt="image" src="https://github.com/user-attachments/assets/c21d9e4b-6cfe-45e9-8176-cab5330cd019" />
+2)Overview
+<img width="1845" height="1077" alt="Screenshot 2026-07-01 102737" src="https://github.com/user-attachments/assets/9fb93802-1602-49b5-b692-bea2b656a9d0" />
+3)Employees
+<img width="1855" height="1072" alt="Screenshot 2026-07-01 102749" src="https://github.com/user-attachments/assets/7b4386c2-0e2d-497f-a862-25450e73cf3f" />
+4)Projects
+<img width="1853" height="1077" alt="Screenshot 2026-07-01 102758" src="https://github.com/user-attachments/assets/1cb9baa0-17da-46d9-84b6-e9b81df1ff40" />
+5)Finance
+<img width="1860" height="1075" alt="Screenshot 2026-07-01 102808" src="https://github.com/user-attachments/assets/d8d65541-7569-4b24-bae5-923160b787f0" />
+
+
+
+
