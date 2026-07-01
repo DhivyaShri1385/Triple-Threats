@@ -289,9 +289,6 @@ MIT License — free to use for educational purposes.
 <img width="1847" height="1076" alt="image" src="https://github.com/user-attachments/assets/12fca962-368b-4b5c-9bdb-cc18983815ea" />
 <img width="1842" height="458" alt="image" src="https://github.com/user-attachments/assets/917a1da5-6361-496a-b21d-558d25dd0259" />
 
-
-
-
 ## Fake Dashboard
 1)Login
 <img width="1848" height="872" alt="image" src="https://github.com/user-attachments/assets/c21d9e4b-6cfe-45e9-8176-cab5330cd019" />
@@ -304,6 +301,10 @@ MIT License — free to use for educational purposes.
 5)Finance
 <img width="1860" height="1075" alt="Screenshot 2026-07-01 102808" src="https://github.com/user-attachments/assets/d8d65541-7569-4b24-bae5-923160b787f0" />
 
+## Alert 
+<img width="1498" height="817" alt="image" src="https://github.com/user-attachments/assets/c527e5af-e9fd-4ab0-8f9c-5e6564e43619" />
 
+##  UEBA Security Report 
+<img width="1845" height="865" alt="image" src="https://github.com/user-attachments/assets/776f86f5-42ec-4a75-bede-6808244589b6" />
 
 
