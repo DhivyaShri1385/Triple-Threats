@@ -284,7 +284,8 @@ MIT License — free to use for educational purposes.
 2)TechNova Solutions 
 <img width="1847" height="871" alt="image" src="https://github.com/user-attachments/assets/5fe1fa45-7a98-427b-b56a-37e3dcbfff35" />
 3)Attacker Activity
-<img width="1843" height="881" alt="image" src="https://github.com/user-attachments/assets/8dfc12fb-b66f-4205-9d5f-645249aeb0c8" />
+<img width="1842" height="878" alt="image" src="https://github.com/user-attachments/assets/c8fdecd8-d1f5-430a-a565-962aafef5d59" />
+
 
 
 ## Fake Dashboard
